@@ -1,0 +1,10 @@
+/reports/
+/target/
+/.idea/
+/src/main/java/net/electrifai/library/runner/TestRunner.class
+/src/test/resources/downloads/
+/bin/
+/.metadata
+/test-output
+/.settings
+/src/test/resources/features/Debug.feature
