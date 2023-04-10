@@ -12,57 +12,44 @@ import java.util.List;
 
 public class ReportLandingPage extends HomePage {
 
-    @FindBy(xpath = "//div[contains(@class,'component_content')]/button[1]")
+    @FindBy(xpath ="//div[contains(@class,'component_content__NXEzW')]/button" )
+    List<WebElement> filterCriteria;
+    @FindBy(xpath = "//div[contains(@class,'component_content__NXEzW')]/button[1]")
     WebElement segmentationDropDown;
     @FindBy(xpath = "//div[contains(@class,'component_content')]/button[2]")
     WebElement propersityDropDown;
     @FindBy(xpath = "//div[contains(@class,'component_content')]/button[3]")
     WebElement dateRangeDropDown;
-    @FindBy(css = "div[class*='ant-dropdown-placement-topLeft']:not([class*='ant-dropdown-hidden'])")
-    WebElement selectedDropDown;
-    @FindBy(css = "div[class*='ant-dropdown-placement-bottomLeft']:not([class*='ant-dropdown-hidden']) li")
+    @FindBy(xpath = "//div[contains(@class,'component_content__NXEzW')]//div[contains(@class,'ant-dropdown') and not(contains(@class,'ant-dropdown-hidden'))]//li")
     List<WebElement> dropDownElements;
-    @FindBy(css = "div[class*='ant-dropdown-placement-bottomLeft'] li[class*='ant-dropdown-menu-item-selected']")
+    @FindBy(css = "//div[contains(@class,'component_content__NXEzW')]//li[contains(@class,'ant-dropdown-menu-item-selected')]")
     List<WebElement> selectedDropDownOptions;
     @FindBy(css = "button[class*='ant-btn ant-btn-primary']:not([class*='ant-dropdown-trigger'])")
     WebElement applyFiltersButton;
     String logMessage;
 
-    public void setOptionForGivenDropDown(String dropDown, String option) {
-        switch (dropDown) {
-            case "Segmentation": {
-                GenericPageActions.moveToElement(segmentationDropDown, "Segmentation Dropdown");
-                selectGivenOptionFromDropDown(option);
-                break;
+    public void selectOptionFromGivenDropDown(String dropDown, String option) {
+         try{
+            for(WebElement element:filterCriteria){
+                if(element.getText().contains(dropDown)){
+                    GenericPageActions.moveToElement(element, dropDown+" Dropdown");
+                    selectGivenOptionFromDropDown(option);
+                }
             }
-            case "Propensity Model": {
-                GenericPageActions.moveToElement(propersityDropDown, "Propensity Model Dropdown");
-                selectGivenOptionFromDropDown(option);
-                break;
-            }
-
-            case "Date Range": {
-                GenericPageActions.moveToElement(dateRangeDropDown, "Data Range Dropdown");
-                selectGivenOptionFromDropDown(option);
-                break;
-            }
-            default: {
-                logMessage = "Given drop down is not available";
-                Assert.fail(logMessage);
-            }
-
+        }catch (Exception e){
+            logMessage = "Given drop down is not available";
+            LogManager.printExceptionLog(e,logMessage);
+            Assert.fail(logMessage);
         }
-
 
     }
 
-
-    private void selectGivenOptionFromDropDown(String option) {
+    public void selectGivenOptionFromDropDown(String option) {
         boolean condition = false;
         try {
 
-            Thread.sleep(1000);
-            Wait.explicitWait(dropDownElements.get(1),"visibility");
+            //Thread.sleep(1000);
+            Wait.explicitWait(dropDownElements.get(0),"visibility");
             for (WebElement element : dropDownElements
             ) {
                  if (element.getText().trim().equals(option)) {
