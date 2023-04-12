@@ -22,7 +22,7 @@ public class ReportPage extends ReportLandingPage {
     WebElement reportTitle;
     @FindBy(css = "div[class*='component_filter'] span[class*='component_info']")
     WebElement filterHeading;
-    @FindBy(xpath ="//div[@class='component_filter__lQEjr']/button" )
+    @FindBy(xpath = "//div[@class='component_filter__lQEjr']/button")
     List<WebElement> filterCriteria;
     @FindBy(xpath = "//div[@class='component_filter__lQEjr']//div[contains(@class,'ant-dropdown') and not(contains(@class,'ant-dropdown-hidden'))]//li")
     List<WebElement> dropDownElements;
@@ -37,8 +37,8 @@ public class ReportPage extends ReportLandingPage {
 
     // customer probability elements
 
-    @FindBy(css = "div[class*='component_checkbox__3mYm1'] label[class*='ant-checkbox-wrapper-checked']")
-    List<WebElement> custProbCheckedBoxNames;
+    @FindBy(css = "div[class*='component_checkbox__3mYm1'] label")
+    List<WebElement> custProbCheckBoxes;
     @FindBy(xpath = "//div[contains(@class,'component_checkbox')]/label[not(contains(@class,'ant-checkbox-wrapper-checked'))]")
     List<WebElement> custProbUnCheckedBoxNames;
     @FindBy(css = "div[class='component_checkbox__3mYm1 compomentCheckbox'] label[class*='ant-checkbox-wrapper-checked']")
@@ -80,8 +80,6 @@ public class ReportPage extends ReportLandingPage {
     WebElement profileExpandTitle;
     @FindBy(css = "div.ant-list.ant-list-split.ant-list-something-after-last-item div.ant-spin-nested-loading")
     WebElement profileScroll;
-    @FindBy(css = "div.ant-list.ant-list-split.ant-list-something-after-last-item li.ant-list-item")
-    List<WebElement> profiles;
     @FindBy(css = "div.ant-list-item-meta div.ant-list-item-meta-avatar")
     List<WebElement> profileAvatarList;
     @FindBy(css = "div.ant-list-item-meta h4.ant-list-item-meta-title")
@@ -90,10 +88,13 @@ public class ReportPage extends ReportLandingPage {
     List<WebElement> profileIdList;
     @FindBy(xpath = "//div[@class='component_titleContainer__uufBP']/div")
     WebElement profileTitle;
+    @FindBy(css = "div[class='component_profile__oOR58'] div[class='ant-list-item-meta']")
+    List<WebElement> profileList;
 
     //profiles pagination elements
+    @FindBy(css = "li[title='Previous Page'] button")
     WebElement profilesPreviousPage;
-    @FindBy(css = "li[title='Next Page']")
+    @FindBy(css = "li[title='Next Page'] button")
     WebElement profilesNextPage;
     @FindBy(css = "li[class*='ant-pagination-item']")
     List<WebElement> profilePages;
@@ -101,7 +102,9 @@ public class ReportPage extends ReportLandingPage {
     WebElement selectedProfilePage;
     @FindBy(css = "li[class='ant-pagination-options'] span[class='ant-select-selection-item']")
     WebElement selectedProfilePageSize;
-    @FindBy(xpath = "//div[contains(@class,'ant-select-item ant-select-item-option')]//div[text()]")
+    @FindBy(css = "li[class='ant-pagination-options'] span[class='ant-select-selection-item']")
+    WebElement pageSizeDropDown;
+    @FindBy(xpath = "//div[contains(@class,'ant-select-item ant-select-item-option')]")
     List<WebElement> pageSizeDropDownOptions;
     @FindBy(xpath = "//div[@class='component_content__NXEzW']//div[@class='component_info__KcmP8']")
     WebElement currentPageIndexText;
@@ -132,7 +135,7 @@ public class ReportPage extends ReportLandingPage {
         String profileTitle = data.get("Profile Title").trim();
         String driverTitle = data.get("Drivers Title").trim();
         //verifySelectionForGivenComponent(selectedCustProbCheckBoxList, customerProb);
-        verifySelectedCustomerProbability(from, to);
+        verifySelectedCustomerProbabilityRange(from, to);
         Assert.assertEquals(driversTitle.getText().trim(), driverTitle);
         Assert.assertEquals(profileMinimizeTitle.getText().split("\\(")[0].trim(), profileTitle);
 
@@ -143,13 +146,28 @@ public class ReportPage extends ReportLandingPage {
         String to = data.get("Customer Probability Range").split("-")[1];
         String profileTitle = data.get("Profile Title").trim();
         String driverTitle = data.get("Drivers Title").trim();
-        verifySelectedCustomerProbability(from, to);
+        verifySelectedCustomerProbability(data.get("Customer Probability"));
+        verifySelectedCustomerProbabilityRange(from, to);
         Assert.assertEquals(driversTitle.getText().trim(), driverTitle);
         Assert.assertEquals(profileMinimizeTitle.getText().split("\\(")[0].trim(), profileTitle);
         LogManager.printInfoLog("Customer probability range selection validated");
     }
 
-    private void doGivenActionOnProfile(String action) {
+    private void verifySelectedCustomerProbability(String expectedCustProb) {
+        List<String> expectedCustProbList = Arrays.asList(expectedCustProb.split(","));
+        List<String> temp = new ArrayList<>();
+        for (WebElement element : custProbCheckBoxes) {
+
+            if (element.getAttribute("class").contains("ant-checkbox-wrapper-checked")) {
+                temp.add(element.getText().trim());
+            }
+        }
+        GenericPageActions.compareGivenLists(temp, "Actual customer probability selection", expectedCustProbList, "Expected customer probability selection");
+        LogManager.printInfoLog(temp + " selection validated");
+
+    }
+
+    public void doGivenActionOnProfile(String action) {
 
         switch (action) {
             case "expand":
@@ -197,7 +215,7 @@ public class ReportPage extends ReportLandingPage {
         return temp;
     }
 
-    public void verifySelectedCustomerProbability(String from, String to) {
+    public void verifySelectedCustomerProbabilityRange(String from, String to) {
         Map<String, String> temp = new HashMap<>();
         temp = getSelectedCustomerProbabilityRange();
         Assert.assertEquals(temp.get("from"), from, "from probability ");
@@ -216,16 +234,19 @@ public class ReportPage extends ReportLandingPage {
     public void selectCustomerProbability(String selectedOptions) {
         List<String> selectedOptionsList = Arrays.asList(selectedOptions.trim().split(","));
         for (String option : selectedOptionsList) {
-            if (!getWebElement(componentCheckbox, option).getAttribute("class").contains("checked")) {
+            if (!getWebElement(componentCheckbox, option).getAttribute("class").contains("ant-checkbox-checked")) {
                 GenericPageActions.click(getWebElement(componentCheckbox, option), " " + option);
-                //Wait.explicitWaitElementAttributeContains(getWebElement(componentCheckbox, option), "class", "checked");
+
             }
         }
-        for (WebElement element : selectedCustProbCheckBoxList) {
+        for (WebElement element : custProbCheckBoxes) {
 
-            if (!selectedOptionsList.contains(element.getText().trim())) {
-                element.findElement(By.cssSelector(checkbox)).click();
+            if (element.getAttribute("class").contains("ant-checkbox-wrapper-checked")) {
+                if (!selectedOptionsList.contains(element.getText().trim())) {
+                    element.findElement(By.cssSelector(checkbox)).click();
+                }
             }
+
         }
         if (selectedOptionsList.equals(getTextForGivenWebElements(selectedCustProbCheckBoxList, "selected customer probability options"))) {
             LogManager.printInfoLog(selectedOptions + " selected");
@@ -241,7 +262,8 @@ public class ReportPage extends ReportLandingPage {
 
         try {
             for (WebElement element : driverNames) {
-                if (!options.contains(element.getText().trim())) {
+                // verify driver to un select when it is already checked
+                if (!(options.contains(element.getText().trim())) && element.findElement(By.xpath("label")).getAttribute("class").contains("checked")) {
                     element.findElement(By.cssSelector(checkbox)).click();
                 }
             }
@@ -267,14 +289,14 @@ public class ReportPage extends ReportLandingPage {
     }
 
     public void verifyDriverSelection(List<String> driversList) {
-        List<String> selectedDrivers = getTextForGivenWebElements(selectedDriverCheckBoxList, "selected drivers");
+        List<String> selectedDrivers = new ArrayList<>(getTextForGivenWebElements(selectedDriverCheckBoxList, "selected drivers"));
         GenericPageActions.compareGivenLists(selectedDrivers, "Selected drivers", driversList, "Expected drivers");
         doGivenActionOnProfile("expand");
         List<String> prfileTableColumnNames = getTextForGivenWebElements(profileTableHeadingList, "customer profile column headings");
         prfileTableColumnNames.removeAll(List.of("Customer Name", "Customer Id"));
         GenericPageActions.compareGivenLists(prfileTableColumnNames, "Avaliable drivers in profile table columns heading",
                 selectedDrivers, "Selected driver in report page");
-        getprofileTableData(false);
+        //getprofileTableData(false);
         doGivenActionOnProfile("minimize");
 
 
@@ -343,28 +365,49 @@ public class ReportPage extends ReportLandingPage {
 
     public void verifyCustomerProfilePaginationWith(String state) {
         LogManager.printInfoLog(" Profile pagination validation started when profile is " + state);
-        int totalProfileCount;
+        int totalProfileCount = 0;
         if (state.equals("minimize")) {
             try { //to handel exception when profile is already minimized.
-                profileExpandTitle.isDisplayed();
-                doGivenActionOnProfile(state);
+                //if (profileExpandTitle.isDisplayed())
+                //doGivenActionOnProfile(state);
             } catch (Exception e) {
             }
-            totalProfileCount = getTotalProfileCountFromGiveView(state);
-            //verifyProfileCountPerPage(10);
+            //totalProfileCount = getTotalProfileCountFromGiveView(state);
+            //verifyProfileCountPerPageWhenProfileMinimize(10);
 
         } else {
             doGivenActionOnProfile(state);
-            totalProfileCount = getTotalProfileCountFromGiveView(state);
-            if (totalProfileCount > 10)
-                verifyProfileCountPerPage(10);
-            else
-                verifyProfileCountPerPage(totalProfileCount);
+        }
+        verifyProfilePageSizeDropDownOptions();
+        List<String> temp = getavaliablePageSizeOptions();
+        // to expand page size drop down elements.
+        GenericPageActions.click(pageSizeDropDown, "Page size dopw down");
+        for (String s : temp) {
+            for (WebElement element : pageSizeDropDownOptions) {
+                if (s.equals(element.getAttribute("title"))) {
+                    GenericPageActions.scrollToElementView(element);
+                    GenericPageActions.click(element, element.getText());
+                    Wait.explicitWait(profilePageNumbers.get(0), "visibility");
+                    Wait.waitUntilElementToBeClickable(profilePageNumbers.get(0));
+                    totalProfileCount = getTotalProfileCountFromGiveView(state);
+                    verifyPageSize(state);
+                    verifyPageCount(totalProfileCount);
+                    GenericPageActions.click(pageSizeDropDown, "Page size drop down");
+                    Wait.explicitWait(pageSizeDropDownOptions.get(0), "visibility");
+                    break;
+                }
+
+            }
+
+
         }
 
-        verifyPageCount(totalProfileCount);
-        verifySelectedPageSize("10",totalProfileCount);
-        verifyProfilepageSizeDropDownOptions();
+        if (state.equals("expand")) {
+            doGivenActionOnProfile("minimize");
+        }
+    }
+
+    private void verifyProfileCountPerPageWhenProfileMinimize(int i) {
     }
 
     private int getTotalProfileCountFromGiveView(String state) {
@@ -380,19 +423,31 @@ public class ReportPage extends ReportLandingPage {
         return temp;
     }
 
-    private void verifyProfileCountPerPage(int expectedProfileCountPerPage) {
+    // to verify page size
+    private void verifyPageSize(String state) {
+        int actualProfileCountPerPage = 0;
         try {
-            int actualProfileCountPerPage=profileTableRowList.size();
-            Assert.assertEquals(actualProfileCountPerPage, expectedProfileCountPerPage);
-            LogManager.printInfoLog("Profile count ("+actualProfileCountPerPage+") validated sucessfully");
+            switch (state) {
+                case "expand":
+                    actualProfileCountPerPage = profileTableRowList.size();
+                    Assert.assertEquals(actualProfileCountPerPage, selectedPageSize());
+                    break;
+                case "minimize":
+                    actualProfileCountPerPage = profileList.size();
+                    Assert.assertEquals(actualProfileCountPerPage, selectedPageSize());
+                    break;
+            }
+            LogManager.printInfoLog("Profile count (" + actualProfileCountPerPage + ") validated sucessfully when profile " + state);
         } catch (Exception e) {
             logMessage = "Profile count validation failed";
             LogManager.printExceptionLog(e, logMessage);
             Assert.fail(logMessage);
         }
+
+
     }
 
-    private void verifyProfilepageSizeDropDownOptions() {
+    private void verifyProfilePageSizeDropDownOptions() {
         List<String> expectedPageSizeOptions = new ArrayList<>(Arrays.asList("10 / page", "20 / page", "50 / page", "100 / page"));
         List<String> actualPageSizeOptions = getavaliablePageSizeOptions();
         GenericPageActions.compareGivenLists(actualPageSizeOptions, "actual Page Size Options ", expectedPageSizeOptions, "expected page size options");
@@ -403,65 +458,82 @@ public class ReportPage extends ReportLandingPage {
 
         expectedPageSize = expectedPageSize + " / page";
         Assert.assertEquals(selectedProfilePageSize.getText(), expectedPageSize, "selected profile page size validation failed");
-        LogManager.printInfoLog("Selected page size ("+expectedPageSize+") validated sucessfullly");
+        LogManager.printInfoLog("Selected page size (" + expectedPageSize + ") validated sucessfullly");
     }
 
     private void verifyPageCount(int profileCount) {
-        int selectedPageSize = 0;
-        selectedPageSize = Integer.parseInt(selectedProfilePageSize.getText().split(" ")[0]);
+
+
         int actualProfilePageCount = Integer.parseInt(profilePageNumbers.get(profilePageNumbers.size() - 1).getAttribute("title"));
         // calculate expected page count
-        int expectedProfilePageCount = profileCount % selectedPageSize > 0 ? (profileCount / selectedPageSize) + 1 : profileCount / selectedPageSize;
+        int expectedProfilePageCount = calculatePageCount(profileCount);
         Assert.assertEquals(actualProfilePageCount, expectedProfilePageCount, " Profile page count validation failed");
-        LogManager.printInfoLog("Profile Page count ("+actualProfilePageCount+") validated");
+        LogManager.printInfoLog("Profile Page count (" + actualProfilePageCount + ") validated");
+    }
+
+    private int calculatePageCount(int profileCount) {
+        int selectedPageSize = selectedPageSize();
+        return profileCount % selectedPageSize > 0 ? (profileCount / selectedPageSize) + 1 : profileCount / selectedPageSize;
+
+    }
+
+    private int selectedPageSize() {
+        return Integer.parseInt(selectedProfilePageSize.getText().split(" ")[0]);
     }
 
     private List<String> getavaliablePageSizeOptions() {
         try {
-            GenericPageActions.click(selectedProfilePageSize, "Page size drop down");
+            GenericPageActions.click(pageSizeDropDown, "Page size drop down");
             GenericPageActions.isElementDisplayed(pageSizeDropDownOptions.get(0), "page size dropdown");
             pageSizeDropDownOptions.stream().forEach(e -> e.isDisplayed());
-            return getTextForGivenWebElements(pageSizeDropDownOptions, "page size options");
+            List<String> temp = new ArrayList<>();
+            for (WebElement element : pageSizeDropDownOptions) {
+                temp.add(element.getAttribute("title"));
+            }
+            GenericPageActions.click(pageSizeDropDown, "Page size drop down");
+            return temp;
         } catch (Exception e) {
             LogManager.printExceptionLog(e, "Unable to get avaliable page size options");
         }
 
         return getTextForGivenWebElements(pageSizeDropDownOptions, "page size options");
     }
+
     public void selectOptionFromGivenDropDown(String dropDown, String option) {
-        try{
-            switch (dropDown){
+        try {
+            switch (dropDown) {
                 case "Segmentation":
-                    GenericPageActions.moveToElement(filterCriteria.get(0), dropDown+" Dropdown");
+                    GenericPageActions.moveToElement(filterCriteria.get(0), dropDown + " Dropdown");
                     selectGivenOptionFromDropDown(option);
                     break;
                 case "Propensity Model":
-                    GenericPageActions.moveToElement(filterCriteria.get(1), dropDown+" Dropdown");
+                    GenericPageActions.moveToElement(filterCriteria.get(1), dropDown + " Dropdown");
                     selectGivenOptionFromDropDown(option);
                     break;
                 case "Date Range":
-                    GenericPageActions.moveToElement(filterCriteria.get(2), dropDown+" Dropdown");
+                    GenericPageActions.moveToElement(filterCriteria.get(2), dropDown + " Dropdown");
                     selectGivenOptionFromDropDown(option);
                     break;
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             logMessage = "Given drop down is not available";
-            LogManager.printExceptionLog(e,logMessage);
+            LogManager.printExceptionLog(e, logMessage);
             Assert.fail(logMessage);
         }
 
     }
+
     public void selectGivenOptionFromDropDown(String option) {
         boolean condition = false;
         try {
 
             //Thread.sleep(1000);
             System.out.println(dropDownElements.get(1).getText());
-            GenericPageActions.isElementDisplayed(dropDownElements.get(1),"dropdown elements");
+            GenericPageActions.isElementDisplayed(dropDownElements.get(1), "dropdown elements");
             for (WebElement element : dropDownElements
             ) {
-                 if (element.getText().trim().equals(option)) {
+                if (element.getText().trim().equals(option)) {
                     GenericPageActions.click(element, "Dropdown option " + option);
                     condition = true;
                     break;
@@ -482,21 +554,40 @@ public class ReportPage extends ReportLandingPage {
     }
 
     public void verifySelectedFilterCtriteria(Map<String, String> data) {
-        List<String> selectedFilterCriteria=getTextForGivenWebElements(filterCriteria,"Selected filter");
-        Assert.assertEquals(selectedFilterCriteria.get(0),(data.get("Segmentation")),"expected segmentation not selected");
-        Assert.assertEquals(selectedFilterCriteria.get(1),(data.get("Propensity")),"expected propensity not selected");
-        Assert.assertEquals(selectedFilterCriteria.get(2),(data.get("Date Range")),"expected propensity not selected");
-        LogManager.printInfoLog(selectedFilterCriteria+ "Segemntation, Propensity and Data Range selection validated sycessfully");
+        List<String> selectedFilterCriteria = getTextForGivenWebElements(filterCriteria, "Selected filter");
+        Assert.assertEquals(selectedFilterCriteria.get(0), (data.get("Segmentation")), "expected segmentation not selected");
+        Assert.assertEquals(selectedFilterCriteria.get(1), (data.get("Propensity")), "expected propensity not selected");
+        Assert.assertEquals(selectedFilterCriteria.get(2), (data.get("Date Range")), "expected propensity not selected");
+        LogManager.printInfoLog(selectedFilterCriteria + "Segemntation, Propensity and Data Range selection validated sycessfully");
 
     }
 
     public void verifySelectedFilterCtriteriaInProfileTable(Map<String, String> data) {
         doGivenActionOnProfile("expand");
-        List<String> temp= Arrays.asList(profileTitle.getText().split("\\n"));
-        Assert.assertEquals(temp.get(1).trim(),data.get("Propensity"));
-        Assert.assertEquals(temp.get(2).trim(),data.get("Segmentation"));
+        List<String> temp = Arrays.asList(profileTitle.getText().split("\\n"));
+        Assert.assertEquals(temp.get(1).trim(), data.get("Propensity"));
+        Assert.assertEquals(temp.get(2).trim(), data.get("Segmentation"));
         doGivenActionOnProfile("minimize");
         LogManager.printInfoLog("Segementation,Propensity is verified on profile page sucessfully");
 
+    }
+
+    public void verifyNavigateToLastPage(String state) {
+        WebElement lastPage=profilePageNumbers.get(profilePageNumbers.size()-1);
+        int lastPageNumber =calculatePageCount(getTotalProfileCountFromGiveView(state));
+        GenericPageActions.click(lastPage,"lastPage");
+        Assert.assertEquals(Integer.parseInt(selectedProfilePage.getText().trim()),lastPageNumber);
+        GenericPageActions.isElementNotEnabled(profilesNextPage,"Next Page button");
+
+    }
+
+    public void VerifyNavigateToFirstPage(String state) {
+        WebElement firstPage=profilePageNumbers.get(0);
+        GenericPageActions.click(firstPage,"firstPage");
+        Assert.assertEquals(Integer.parseInt(selectedProfilePage.getText().trim()),1);
+        GenericPageActions.isElementNotEnabled(profilesPreviousPage,"Previous Page button");
+    }
+
+    public void verifyPageNavigationByOneStep(String state) {
     }
 }

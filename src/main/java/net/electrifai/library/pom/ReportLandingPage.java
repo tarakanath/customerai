@@ -12,17 +12,11 @@ import java.util.List;
 
 public class ReportLandingPage extends HomePage {
 
-    @FindBy(xpath ="//div[contains(@class,'component_content__NXEzW')]/button" )
+    @FindBy(xpath ="//div[@class='component_content__NXEzW']/button" )
     List<WebElement> filterCriteria;
-    @FindBy(xpath = "//div[contains(@class,'component_content__NXEzW')]/button[1]")
-    WebElement segmentationDropDown;
-    @FindBy(xpath = "//div[contains(@class,'component_content')]/button[2]")
-    WebElement propersityDropDown;
-    @FindBy(xpath = "//div[contains(@class,'component_content')]/button[3]")
-    WebElement dateRangeDropDown;
-    @FindBy(xpath = "//div[contains(@class,'component_content__NXEzW')]//div[contains(@class,'ant-dropdown') and not(contains(@class,'ant-dropdown-hidden'))]//li")
+    @FindBy(xpath = "//div[@class='component_content__NXEzW']//div[contains(@class,'ant-dropdown') and not(contains(@class,'ant-dropdown-hidden'))]//li")
     List<WebElement> dropDownElements;
-    @FindBy(css = "//div[contains(@class,'component_content__NXEzW')]//li[contains(@class,'ant-dropdown-menu-item-selected')]")
+    @FindBy(css = "//div[@class='component_content__NXEzW']//li[contains(@class,'ant-dropdown-menu-item-selected')]")
     List<WebElement> selectedDropDownOptions;
     @FindBy(css = "button[class*='ant-btn ant-btn-primary']:not([class*='ant-dropdown-trigger'])")
     WebElement applyFiltersButton;
@@ -49,7 +43,7 @@ public class ReportLandingPage extends HomePage {
         try {
 
             //Thread.sleep(1000);
-            Wait.explicitWait(dropDownElements.get(0),"visibility");
+            Wait.explicitWait(dropDownElements.get(1),"visibility");
             for (WebElement element : dropDownElements
             ) {
                  if (element.getText().trim().equals(option)) {

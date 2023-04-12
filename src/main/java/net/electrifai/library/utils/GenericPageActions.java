@@ -309,9 +309,10 @@ public class GenericPageActions {
      */
     public static void isElementNotEnabled(WebElement element, String elementName) {
         try {
-            Wait.waitUntilElementToBeClickable(element);
+            //Wait.waitUntilElementToBeClickable(element);
             ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
-            Assert.assertTrue(element.getAttribute("disabled") == null);
+            Assert.assertTrue(element.getAttribute("disabled").equals("true"));
+            LogManager.printInfoLog(elementName+" is not enabled");
 
         } catch (Exception exception) {
             exception.printStackTrace();
