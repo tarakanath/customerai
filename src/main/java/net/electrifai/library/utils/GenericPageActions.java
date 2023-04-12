@@ -14,6 +14,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GenericPageActions {
     /**
@@ -25,7 +26,7 @@ public class GenericPageActions {
     public static void click(WebElement element, String elementName) {
         try {
             Wait.waitUntilElementToBeClickable(element);
-            ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+            ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(false);", element);
             element.click();
             LogManager.printInfoLog("Clicked on  " + getElementName(elementName) + "");
         } catch (Exception exception) {
@@ -308,9 +309,10 @@ public class GenericPageActions {
      */
     public static void isElementNotEnabled(WebElement element, String elementName) {
         try {
-            Wait.waitUntilElementToBeClickable(element);
+            //Wait.waitUntilElementToBeClickable(element);
             ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
-            Assert.assertTrue(element.getAttribute("disabled") == null);
+            Assert.assertTrue(element.getAttribute("disabled").equals("true"));
+            LogManager.printInfoLog(elementName+" is not enabled");
 
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -419,7 +421,7 @@ public class GenericPageActions {
     }
 
     public static void scrollToElementView(WebElement element) {
-        ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+        ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(false);", element);
     }
 
     /**
@@ -432,7 +434,7 @@ public class GenericPageActions {
         Actions action = new Actions(ThreadLocalManager.getDriver());
         try {
             Wait.waitUntilElementToBeClickable(element);
-            ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+            ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(false);", element);
             action.moveToElement(element).build().perform();
             LogManager.printInfoLog("Moved Cursor On  " + getElementName(elementName) + "");
         } catch (Exception exception) {
@@ -513,5 +515,18 @@ public class GenericPageActions {
 
     public static void switchToParentFrame() {
         ThreadLocalManager.getDriver().switchTo().parentFrame();
+    }
+    public static void compareGivenLists(List<String>actualList,String nameOfActualList,List<String>expectedList,String nameOfExpectedList){
+        String logMessage;
+        try {
+           Assert.assertEquals(actualList.stream().sorted().collect(Collectors.toList()),expectedList.stream().sorted().collect(Collectors.toList()));
+           logMessage=nameOfActualList+" validated successfully";
+           LogManager.printInfoLog(logMessage);
+
+       } catch (Exception e){
+           logMessage = nameOfActualList+" "+nameOfExpectedList+ " not matched";
+           LogManager.printExceptionLog(e,logMessage);
+           Assert.fail(logMessage);
+       }
     }
 }

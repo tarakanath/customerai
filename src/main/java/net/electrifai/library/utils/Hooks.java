@@ -11,6 +11,7 @@ import net.electrifai.library.pom.SegmentationPage;
 import org.apache.commons.configuration.ConfigurationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.AfterTest;
 
 import java.io.FileNotFoundException;
@@ -117,7 +118,7 @@ public class Hooks extends AbstractTestNGCucumberTests
         if (loginAsNonLearner1.size()==1) {
          LogManager.printInfoLog("Already in common login page");
         } else {
-        loginPage.logout();
+        //loginPage.logout();
         ThreadLocalManager.getDriver().manage().deleteAllCookies();
     }
     }
@@ -150,6 +151,7 @@ public class Hooks extends AbstractTestNGCucumberTests
 
 
    }
+
     /*@After("@smoke")
     public void afterScanario(Scenario scenario) throws IOException{
         segmentationPage.doGivenActionOnGivenSegment("delete",segmentName);
