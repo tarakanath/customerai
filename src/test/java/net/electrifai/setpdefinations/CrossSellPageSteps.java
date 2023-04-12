@@ -145,7 +145,15 @@ public class CrossSellPageSteps {
 
     @Then("verify customer profile pagination with {string}")
     public void verifyCustomerProfilePaginationWith(String state) {
+        if(!state.equals("minimize"))
+            reportPage.doGivenActionOnProfile(state);
         reportPage.verifyCustomerProfilePaginationWith(state);
+        reportPage.verifyNavigationToLastPage(state);
+        reportPage.VerifyNavigationToFirstPage(state);
+        reportPage.verifyPageNavigationByOneStep(state);
+        if(state.equals("expand")) // to minimize the profile for next step validation.
+            reportPage.doGivenActionOnProfile("minimize");
+
     }
 
     @Then("update {string} filter criteria from the file {string} where the sheet is {string} and DataRowNum is {string}")
@@ -182,12 +190,21 @@ public class CrossSellPageSteps {
         reportPage.verifySelectedFilterCtriteriaInProfileTable(data);
     }
 
-    @Then("verify profile page navigation with {string}")
-    public void verifyProfilePageNavigationWith(String state) {
+    @Then("verify customer profile info page validate with profile window {string}")
+    public void verifyCustomerProfileInfoPageValidateWithProfileWindow(String state) {
         if(!state.equals("minimize"))
             reportPage.doGivenActionOnProfile(state);
-        reportPage.verifyNavigateToLastPage(state);
-        reportPage.VerifyNavigateToFirstPage(state);
-        //reportPage.verifyPageNavigationByOneStep(state);
+        reportPage.validateCustomerProfileToViewWhenProfileWindow(state);
+    }
+
+    @Then("verify drivers filter in customer profile table.")
+    public void verifyDriversFilterInCustomerProfileTable() {
+        List<String> driversList = new ArrayList<>(Arrays.asList("Driver 1", "Driver 2", "Driver 3", "Driver 4", "Driver 5"));
+        Random ran = new Random();
+        List<String> selectedDriver=new ArrayList<>();
+        selectedDriver.add(driversList.get(ran.nextInt(5)));
+        reportPage.doGivenActionOnProfile("expand");
+        reportPage.setupFilterForSelectedDrivers(selectedDriver);
+
     }
 }

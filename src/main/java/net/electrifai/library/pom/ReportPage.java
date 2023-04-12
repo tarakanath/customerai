@@ -117,7 +117,20 @@ public class ReportPage extends ReportLandingPage {
     List<WebElement> profileTableHeadingList;
     @FindBy(xpath = "//tbody[@class='ant-table-tbody']//tr[@class='ant-table-row ant-table-row-level-0']")
     List<WebElement> profileTableRowList;
+    @FindBy(xpath = "//span[@role='button']")
+    WebElement driverFilterButton;
+    @FindBy(css = "div [class*='ant-table-filter-dropdown']")
+    WebElement driverFilterDropDown;
+    @FindBy(css = "div [class*='rc-virtual-list-holder-inner']>div")
+    List<WebElement> getDriverFilterDropDownElements;
+
     StopWatch stopWatch = new StopWatch();
+
+    //customer profile view elements
+    @FindBy(css = "div[class='component_productName__56lGW'] span[class='anticon anticon-arrow-left']")
+    WebElement custProfileClose;
+    @FindBy(css = "div[class='component_personalProfile__BnMEl'] div span")
+    WebElement customerName;
 
     String driverTitle;
     StringBuilder sb = new StringBuilder();
@@ -366,18 +379,6 @@ public class ReportPage extends ReportLandingPage {
     public void verifyCustomerProfilePaginationWith(String state) {
         LogManager.printInfoLog(" Profile pagination validation started when profile is " + state);
         int totalProfileCount = 0;
-        if (state.equals("minimize")) {
-            try { //to handel exception when profile is already minimized.
-                //if (profileExpandTitle.isDisplayed())
-                //doGivenActionOnProfile(state);
-            } catch (Exception e) {
-            }
-            //totalProfileCount = getTotalProfileCountFromGiveView(state);
-            //verifyProfileCountPerPageWhenProfileMinimize(10);
-
-        } else {
-            doGivenActionOnProfile(state);
-        }
         verifyProfilePageSizeDropDownOptions();
         List<String> temp = getavaliablePageSizeOptions();
         // to expand page size drop down elements.
@@ -390,7 +391,7 @@ public class ReportPage extends ReportLandingPage {
                     Wait.explicitWait(profilePageNumbers.get(0), "visibility");
                     Wait.waitUntilElementToBeClickable(profilePageNumbers.get(0));
                     totalProfileCount = getTotalProfileCountFromGiveView(state);
-                    verifyPageSize(state);
+                    verifyPageSizeForCurrentView(state);
                     verifyPageCount(totalProfileCount);
                     GenericPageActions.click(pageSizeDropDown, "Page size drop down");
                     Wait.explicitWait(pageSizeDropDownOptions.get(0), "visibility");
@@ -400,10 +401,6 @@ public class ReportPage extends ReportLandingPage {
             }
 
 
-        }
-
-        if (state.equals("expand")) {
-            doGivenActionOnProfile("minimize");
         }
     }
 
@@ -424,27 +421,29 @@ public class ReportPage extends ReportLandingPage {
     }
 
     // to verify page size
-    private void verifyPageSize(String state) {
+    private void verifyPageSizeForCurrentView(String state) {
+        int actualProfileCountPerPage= getProfileCountForCurrentPageFromSelectedView(state);
+        Assert.assertEquals(actualProfileCountPerPage, getSelectedPageSize(),"Profiles count per page validate failed ");
+        LogManager.printInfoLog("Profile count (" + actualProfileCountPerPage + ") validated sucessfully when profile " + state);
+    }
+    private int getProfileCountForCurrentPageFromSelectedView(String state){
         int actualProfileCountPerPage = 0;
         try {
             switch (state) {
                 case "expand":
                     actualProfileCountPerPage = profileTableRowList.size();
-                    Assert.assertEquals(actualProfileCountPerPage, selectedPageSize());
                     break;
                 case "minimize":
                     actualProfileCountPerPage = profileList.size();
-                    Assert.assertEquals(actualProfileCountPerPage, selectedPageSize());
                     break;
             }
-            LogManager.printInfoLog("Profile count (" + actualProfileCountPerPage + ") validated sucessfully when profile " + state);
+
         } catch (Exception e) {
             logMessage = "Profile count validation failed";
             LogManager.printExceptionLog(e, logMessage);
             Assert.fail(logMessage);
         }
-
-
+        return actualProfileCountPerPage;
     }
 
     private void verifyProfilePageSizeDropDownOptions() {
@@ -466,18 +465,18 @@ public class ReportPage extends ReportLandingPage {
 
         int actualProfilePageCount = Integer.parseInt(profilePageNumbers.get(profilePageNumbers.size() - 1).getAttribute("title"));
         // calculate expected page count
-        int expectedProfilePageCount = calculatePageCount(profileCount);
+        int expectedProfilePageCount = getExpectedPageCount(profileCount);
         Assert.assertEquals(actualProfilePageCount, expectedProfilePageCount, " Profile page count validation failed");
         LogManager.printInfoLog("Profile Page count (" + actualProfilePageCount + ") validated");
     }
 
-    private int calculatePageCount(int profileCount) {
-        int selectedPageSize = selectedPageSize();
+    private int getExpectedPageCount(int profileCount) {
+        int selectedPageSize = getSelectedPageSize();
         return profileCount % selectedPageSize > 0 ? (profileCount / selectedPageSize) + 1 : profileCount / selectedPageSize;
 
     }
 
-    private int selectedPageSize() {
+    private int getSelectedPageSize() {
         return Integer.parseInt(selectedProfilePageSize.getText().split(" ")[0]);
     }
 
@@ -572,22 +571,90 @@ public class ReportPage extends ReportLandingPage {
 
     }
 
-    public void verifyNavigateToLastPage(String state) {
-        WebElement lastPage=profilePageNumbers.get(profilePageNumbers.size()-1);
-        int lastPageNumber =calculatePageCount(getTotalProfileCountFromGiveView(state));
-        GenericPageActions.click(lastPage,"lastPage");
-        Assert.assertEquals(Integer.parseInt(selectedProfilePage.getText().trim()),lastPageNumber);
-        GenericPageActions.isElementNotEnabled(profilesNextPage,"Next Page button");
+    public void verifyNavigationToLastPage(String state) {
+        int selectedPageSize=getSelectedPageSize();
+        int totalProfileCount=getTotalProfileCountFromGiveView(state);
+        int lastPageNumber = getExpectedPageCount(getTotalProfileCountFromGiveView(state));
+        int actualLastPageProfilesCount= 0;
+        int expectedLastPageProfilesCount=totalProfileCount % selectedPageSize==0?selectedPageSize:(totalProfileCount % selectedPageSize);
+        WebElement lastPage = profilePageNumbers.get(profilePageNumbers.size() - 1);
+        GenericPageActions.click(lastPage, "lastPage");
+        actualLastPageProfilesCount= getProfileCountForCurrentPageFromSelectedView(state);
+        Assert.assertEquals(actualLastPageProfilesCount,expectedLastPageProfilesCount,"Last page profile count validation failed");
+        LogManager.printInfoLog("Last page ("+lastPageNumber+") profile count ("+actualLastPageProfilesCount+") validated sucessfully");
+        Assert.assertEquals(Integer.parseInt(selectedProfilePage.getText().trim()), lastPageNumber);
+        GenericPageActions.isElementNotEnabled(profilesNextPage, "Next Page button");
 
     }
 
-    public void VerifyNavigateToFirstPage(String state) {
-        WebElement firstPage=profilePageNumbers.get(0);
-        GenericPageActions.click(firstPage,"firstPage");
-        Assert.assertEquals(Integer.parseInt(selectedProfilePage.getText().trim()),1);
-        GenericPageActions.isElementNotEnabled(profilesPreviousPage,"Previous Page button");
+    public void VerifyNavigationToFirstPage(String state) {
+        WebElement firstPage = profilePageNumbers.get(0);
+        GenericPageActions.click(firstPage, "firstPage");
+        Assert.assertEquals(Integer.parseInt(selectedProfilePage.getText().trim()), 1);
+        GenericPageActions.isElementNotEnabled(profilesPreviousPage, "Previous Page button");
     }
 
     public void verifyPageNavigationByOneStep(String state) {
+        int numberOfPage = getExpectedPageCount(getTotalProfileCountFromGiveView(state));
+        int pageSize= getSelectedPageSize();
+        for (int i = 0; numberOfPage >= i; i++) {
+
+            try {
+                int intialPageNo = Integer.parseInt(selectedProfilePage.getText().trim());
+                GenericPageActions.click(profilesNextPage, "Next Page");
+                int selectedPageNo = Integer.parseInt(selectedProfilePage.getText().trim());
+                Assert.assertEquals(selectedPageNo,intialPageNo+1);
+                LogManager.printInfoLog("Navigation to page "+selectedPageNo+" validation sucessfull when profiles window "+ state);
+                if(state.equals("expand")){
+                    verifyShowingRecordsText(selectedPageNo);
+                }
+            } catch (NumberFormatException e) {
+                logMessage = "Unable parse the current page number from active page webelement";
+                LogManager.printExceptionLog(e, logMessage);
+            }
+            if (i == 3) {
+                break;
+            }
+
+        }
+
+    }
+
+    private void verifyShowingRecordsText(int selectedPageNo) {
+        int selectedPageSize=getSelectedPageSize();
+        int totalRecordsCount= getTotalProfileCountFromGiveView("expand");
+        String actualText=currentPageIndexText.getText().trim();
+        int pageStartRecordNumber= (selectedPageNo-1)*selectedPageSize+1;
+        int pageEndRecordNumber=pageStartRecordNumber+(selectedPageSize-1);
+        String expectedText="Showing "+pageStartRecordNumber+" to "+pageEndRecordNumber+" of "+ totalRecordsCount+" items";
+        Assert.assertEquals(actualText,expectedText,"Showing Records Text validation failed.");
+        LogManager.printInfoLog(expectedText+" validation completed sucessfully");
+    }
+
+    public void validateCustomerProfileToViewWhenProfileWindow(String state) {
+        WebElement element=getCustomerProfileEelementByIndexWhenProfileWindow(3,state);
+        String expectedCustomerName=element.getText().trim();
+        GenericPageActions.click(element,expectedCustomerName+ " profile");
+        Assert.assertEquals(customerName.getText().trim(),expectedCustomerName);
+        GenericPageActions.click(custProfileClose,"customer Profile Close");
+        LogManager.printInfoLog("Customer profile view page validated sucessfully when profiles window "+state);
+
+
+    }
+
+    private WebElement getCustomerProfileEelementByIndexWhenProfileWindow(int i, String state) {
+        switch (state){
+            case "expand":
+
+                return profileTableRowList.get(i).findElement(By.xpath("td/span"));
+
+            case "minimize":
+                return profileList.get(i).findElement(By.cssSelector("div[class='component_name__tD6uX']"));
+        }
+        return null;
+    }
+
+    public void setupFilterForSelectedDrivers(List<String> selectedDriver) {
+        //profileTableHeadingList
     }
 }
