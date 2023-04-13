@@ -28,6 +28,8 @@ public class ReportLandingPage extends HomePage {
                 if(element.getText().contains(dropDown)){
                     GenericPageActions.moveToElement(element, dropDown+" Dropdown");
                     selectGivenOptionFromDropDown(option);
+                    // below step has been added to avoid synchronization issue
+                    GenericPageActions.moveToElement(userIcon,"user icon");
                 }
             }
         }catch (Exception e){
