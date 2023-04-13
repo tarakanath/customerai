@@ -10,6 +10,7 @@ import net.electrifai.library.utils.ThreadLocalManager;
 import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static net.electrifai.library.pom.HomePage.*;
 
@@ -190,11 +191,13 @@ public class CrossSellPageSteps {
         reportPage.verifySelectedFilterCtriteriaInProfileTable(data);
     }
 
-    @Then("verify customer profile info page validate with profile window {string}")
-    public void verifyCustomerProfileInfoPageValidateWithProfileWindow(String state) {
+    @Then("verify customer profile info page when profile window {string}")
+    public void verifyCustomerProfileInfoPageWhenProfileWindow(String state) {
         if(!state.equals("minimize"))
             reportPage.doGivenActionOnProfile(state);
         reportPage.validateCustomerProfileToViewWhenProfileWindow(state);
+        if(state.equals("expand"))
+            reportPage.doGivenActionOnProfile("minimize");
     }
 
     @Then("verify drivers filter in customer profile table.")
@@ -202,9 +205,11 @@ public class CrossSellPageSteps {
         List<String> driversList = new ArrayList<>(Arrays.asList("Driver 1", "Driver 2", "Driver 3", "Driver 4", "Driver 5"));
         Random ran = new Random();
         List<String> selectedDriver=new ArrayList<>();
-        selectedDriver.add(driversList.get(ran.nextInt(5)));
+        int i=ran.nextInt(5);
+        selectedDriver.add(driversList.get(i));
         reportPage.doGivenActionOnProfile("expand");
         reportPage.setupFilterForSelectedDrivers(selectedDriver);
+        reportPage.doGivenActionOnProfile("minimize");
 
     }
 }
