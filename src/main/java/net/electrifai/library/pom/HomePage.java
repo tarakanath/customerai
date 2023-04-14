@@ -114,6 +114,7 @@ public class HomePage {
     public String getPageHeading() {
         return pageHeading.getText().trim();
     }
+
     public WebElement getWebElement(String xpath, String i) {
         xpath = xpath.replace("textToReplace", i);
         return ThreadLocalManager.getDriver().findElement(By.xpath(xpath));

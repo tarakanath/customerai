@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.electrifai.library.utils.LogManager.scenario;
+
 public class GenericPageActions {
     /**
      * Method to click on element  using selenium
@@ -56,9 +58,9 @@ public class GenericPageActions {
             exception.printStackTrace();
             LogManager.printInfoLog("As javascript click not working trying actions click");
             //GenericPageActions.actionClick(element,elementName);  //Need to check (Findings)
-           String logMessage = "could not perform click action on \'" + getElementName(elementName) + "\'  " + extractElementType(elementName) + "";
-           LogManager.printExceptionLog(exception, logMessage);
-           Assert.fail(exception.getMessage());
+            String logMessage = "could not perform click action on \'" + getElementName(elementName) + "\'  " + extractElementType(elementName) + "";
+            LogManager.printExceptionLog(exception, logMessage);
+            Assert.fail(exception.getMessage());
         }
     }
 
@@ -114,9 +116,9 @@ public class GenericPageActions {
     public static void enterTextOnElement(WebElement element, String elementName, String inputData) {
         try {
             Wait.waitUntilElementToBeClickable(element);
-           // ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+            // ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
             element.clear();
-           // element.sendKeys(Keys.DELETE);
+            // element.sendKeys(Keys.DELETE);
             element.sendKeys(inputData.trim());
             LogManager.printInfoLog("Entered text into  " + getElementName(elementName) + " as \"" + inputData + "\"");
         } catch (Exception exception) {
@@ -138,7 +140,7 @@ public class GenericPageActions {
     public static void uploadImage(WebElement element, String elementName, String fileUploadPath) {
         try {
             ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
-           // String filePathToUpload = fileUploadPath.replace("\\", "/");
+            // String filePathToUpload = fileUploadPath.replace("\\", "/");
             element.sendKeys(fileUploadPath);
             String[] filePath = fileUploadPath.split("/");
             String file = filePath[filePath.length - 1];
@@ -168,6 +170,7 @@ public class GenericPageActions {
         }
 
     }
+
     /**
      * Method to verify the display of the element
      *
@@ -177,7 +180,7 @@ public class GenericPageActions {
     public static void isElementDisplayed(WebElement element, String elementName) {
         try {
             Wait.waitUntilElementToBeClickable(element);
-            ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+            ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(false);", element);
             Assert.assertTrue(element.isDisplayed());
             LogManager.printInfoLog("" + getElementName(elementName) + " is displayed ");
 
@@ -216,11 +219,11 @@ public class GenericPageActions {
     public static void isElementDisplayedWithExpectedText(WebElement element, String elementName, String expectedResult) {
         try {
 
-            ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+            ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(false);", element);
             Assert.assertTrue(element.isDisplayed());
             String actualResult = element.getText().trim();
             Assert.assertEquals(actualResult, expectedResult.trim());
-            LogManager.printInfoLog("" + actualResult + " is displayed");
+            LogManager.printInfoLog(elementName + " displayed with text" + actualResult);
 
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -236,12 +239,11 @@ public class GenericPageActions {
      * @param element        = WebElement
      * @param elementName    = Name of the element to  display in the report
      * @param expectedResult = Expected result
-     * Author - Taniya Gulia
+     *                       Author - Taniya Gulia
      */
 
 
-    public static void isElementNotDisplayedWithExpectedText(WebElement element, String elementName, String expectedResult)
-    {
+    public static void isElementNotDisplayedWithExpectedText(WebElement element, String elementName, String expectedResult) {
         try {
             Wait.waitUntilElementToBeClickable(element);
             ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
@@ -249,10 +251,9 @@ public class GenericPageActions {
             String actualResult = element.getText().trim();
             Assert.assertNotEquals(actualResult, expectedResult.trim());
             LogManager.printInfoLog("" + actualResult + " is successfully not displaying");
-        }
-        catch (Exception exception){
+        } catch (Exception exception) {
             exception.printStackTrace();
-            String logMessage= " "+ getElementName(elementName)+" Element is "+extractElementType(elementName)+" displaying";
+            String logMessage = " " + getElementName(elementName) + " Element is " + extractElementType(elementName) + " displaying";
             LogManager.printExceptionLog(exception, logMessage);
             Assert.fail(exception.getMessage());
         }
@@ -312,7 +313,7 @@ public class GenericPageActions {
             //Wait.waitUntilElementToBeClickable(element);
             ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
             Assert.assertTrue(element.getAttribute("disabled").equals("true"));
-            LogManager.printInfoLog(elementName+" is not enabled");
+            LogManager.printInfoLog(elementName + " is not enabled");
 
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -347,8 +348,8 @@ public class GenericPageActions {
         try {
             element.clear();
             element.sendKeys(inputData);
-        }catch (Exception e){
-         System.out.println(elementName);
+        } catch (Exception e) {
+            System.out.println(elementName);
         }
 
     }
@@ -455,7 +456,7 @@ public class GenericPageActions {
     public static void actionHover(WebElement element, String elementName) {
         Actions action = new Actions(ThreadLocalManager.getDriver());
         try {
-                //Wait.waitUntilElementToBeClickable(element);
+            //Wait.waitUntilElementToBeClickable(element);
             ((JavascriptExecutor) ThreadLocalManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
 
             action.moveToElement(element).perform();
@@ -488,7 +489,6 @@ public class GenericPageActions {
     /**
      * Method to generate Random number between a specific range
      *
-     *
      * @return = Random number
      * Author - Taniya Gulia
      */
@@ -502,8 +502,8 @@ public class GenericPageActions {
     }
 
     public static void switchToChildTabAndClose() {
-        List<String> multipleTabs=new ArrayList<>(ThreadLocalManager.getDriver().getWindowHandles());
-        LogManager.printInfoLog("Number of Tabs In Chrome Browser:"+multipleTabs.size());
+        List<String> multipleTabs = new ArrayList<>(ThreadLocalManager.getDriver().getWindowHandles());
+        LogManager.printInfoLog("Number of Tabs In Chrome Browser:" + multipleTabs.size());
         ThreadLocalManager.getDriver().switchTo().window(multipleTabs.get(1));
         ThreadLocalManager.getDriver().close();
         ThreadLocalManager.getDriver().switchTo().window(multipleTabs.get(0));
@@ -516,17 +516,24 @@ public class GenericPageActions {
     public static void switchToParentFrame() {
         ThreadLocalManager.getDriver().switchTo().parentFrame();
     }
-    public static void compareGivenLists(List<String>actualList,String nameOfActualList,List<String>expectedList,String nameOfExpectedList){
+
+    public static void compareGivenLists(List<String> actualList, String nameOfActualList, List<String> expectedList, String nameOfExpectedList) {
         String logMessage;
         try {
-           Assert.assertEquals(actualList.stream().sorted().collect(Collectors.toList()),expectedList.stream().sorted().collect(Collectors.toList()));
-           logMessage=nameOfActualList+" validated successfully";
-           LogManager.printInfoLog(logMessage);
+            Assert.assertEquals(actualList.stream().sorted().collect(Collectors.toList()), expectedList.stream().sorted().collect(Collectors.toList()));
+            logMessage = nameOfActualList + " validated successfully";
+            LogManager.printInfoLog(logMessage);
 
-       } catch (Exception e){
-           logMessage = nameOfActualList+" "+nameOfExpectedList+ " not matched";
-           LogManager.printExceptionLog(e,logMessage);
-           Assert.fail(logMessage);
-       }
+        } catch (Exception e) {
+            logMessage = nameOfActualList + " " + nameOfExpectedList + " not matched";
+            LogManager.printExceptionLog(e, logMessage);
+            Assert.fail(logMessage);
+        }
+    }
+
+    public static void takeScreenShot() {
+        String screenShotName = "Screenshot" + generateRandomName(10);
+        scenario.attach(Screenshot.getScreenShot(), "image/png", screenShotName);
+        LogManager.printInfoLog("Screen shot captured with image name " + screenShotName);
     }
 }
