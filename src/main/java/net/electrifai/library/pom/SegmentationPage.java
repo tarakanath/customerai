@@ -37,10 +37,8 @@ public class SegmentationPage extends HomePage {
     List<WebElement> existingSegmentationNameList;
     @FindBy(css = "div.segmentation_item__cETbN.segmentItem div:first-child div:last-child")
     List<WebElement> existingSegmentationNameBySelectedFilterList;
-    @FindBy(css = "div.segmentation_edit__y72ss.edit div:first-child")
-    List<WebElement> segmentationRenameButton;
-    @FindBy(css = "div.segmentation_edit__y72ss.edit div:last-child")
-    List<WebElement> segmentationDeleteButton;
+    String segmentationEditButton = "div.segmentation_edit__y72ss.edit div:first-child";
+    String segmentationDeleteButton = "div.segmentation_edit__y72ss.edit div:last-child";
     @FindBy(xpath = "//div[contains(@class,'ant-select-dropdown-placement-bottomLeft')]//div[@class='ant-select-item-option-content']")
     List<WebElement> pages;
     @FindBy(xpath = "//div[contains(@class,'ant-pagination-options-size-changer')]")
@@ -208,7 +206,7 @@ public class SegmentationPage extends HomePage {
     public void VerifyPopUpMessage(String expectedMessage1, String expectedMessage2, String messageType) {
         try {
             Thread.sleep(2000);
-           GenericPageActions.isElementDisplayed(segmentationPopup, "Segment generation " + messageType + " " +
+            GenericPageActions.isElementDisplayed(segmentationPopup, "Segment generation " + messageType + " " +
                     "popup");
             GenericPageActions.isElementDisplayedWithExpectedText(segmentPopUpMessage.get(0), messageType, expectedMessage1);
             if (expectedMessage1.contains("Oops")) {
@@ -229,8 +227,8 @@ public class SegmentationPage extends HomePage {
     }
 
     public void popupMessageAction(String action) {
-        if(action.equalsIgnoreCase("close")){
-            GenericPageActions.click(segmentGenerationPopupButtons.get(0),"X button");
+        if (action.equalsIgnoreCase("close")) {
+            GenericPageActions.click(segmentGenerationPopupButtons.get(0), "X button");
         } else {
             for (WebElement button : segmentGenerationPopupButtons) {
                 if (button.getText().equals(action)) {
@@ -241,11 +239,8 @@ public class SegmentationPage extends HomePage {
     }
 
     public void confirmSegmentGeneration(String action) {
-
         try {
             popupMessageAction(action);
-
-
         } catch (Exception e) {
             e.printStackTrace();
             String logMessage = "Segment generate " + action + " failed";
@@ -280,77 +275,61 @@ public class SegmentationPage extends HomePage {
 
     }
 
-    public void doGivenActionOnGivenSegmentd(String action, String givenSegmentName) {
-        navigateToSelectedPage("Segmentation");
-        boolean status = false;
-        try {
-            outerloop:
-            do {
-                for (int i = 0; existingSegmentationNameList.size() > i; i++) {
-                    if (existingSegmentationNameList.get(i).getAttribute("title").trim().equals(givenSegmentName)) {
-                        GenericPageActions.moveToElement(existingSegmentationNameList.get(i), "Given segmentation");
-                        break outerloop;
-                    }
-                }
+    public void verifyGivenSegmentAvailable(String expectedSegmentName) {
+        String actualSegmentName = getGivenSegmentWebElement(expectedSegmentName).findElement(By.xpath("div/div")).getAttribute("title");
+        Assert.assertEquals(actualSegmentName, (expectedSegmentName), "given segmentation not found");
+        LogManager.printInfoLog(actualSegmentName + " segmentation found");
+    }
 
-                if (nextPage.isEnabled()) {
-                    GenericPageActions.click(nextPage, "next_page");
-                    status = true;
-                } else
-                    status = false;
-
-            } while (!status);
-
-            if (!status) {
-                LogManager.printFailLog("Given segmentation not found for " + action);
-            }
-
-            LogManager.printInfoLog("Given segment name not available in list to delete.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            String logMessage = "Given segment name search failed";
-            LogManager.printExceptionLog(e, logMessage);
-            Assert.fail(e.getMessage());
+    public void verifyGivenSegmentNotFound(String expectedSegmentName) {
+        if (getGivenSegmentWebElement(expectedSegmentName) == null) {
+            LogManager.printPassLog(expectedSegmentName + " not found in segment list");
+        } else {
+            Assert.fail(expectedSegmentName + " found in segment list");
         }
     }
 
     public void doGivenActionOnGivenSegment(String action, Map<String, String> data) {
         navigateToSelectedPage("Segmentation");
+        WebElement element = getGivenSegmentWebElement(data.get("segmentName"));
+        WebElement deleteButton = element.findElement(By.cssSelector(segmentationDeleteButton));
+        WebElement editButton = element.findElement(By.cssSelector(segmentationEditButton));
+        switch (action) {
+            case "delete":
+                GenericPageActions.moveToElement(element, data.get("segmentName"));
+                GenericPageActions.isElementEnabled(deleteButton, "Segment Delete button");
+                GenericPageActions.actionClick(deleteButton, "Segment Delete button");
+                popupMessageAction("Yes");
+                break;
+            case "rename":
+                GenericPageActions.isElementEnabled(editButton, "Segment Rename button");
+                GenericPageActions.actionClick(editButton, "Segment Rename button");
+                break;
+            default:
+                LogManager.printFailLog("incorrect action " + action);
+        }
 
-        for (int i = 0; existingSegmentationNameList.size() > i; i++) {
-            if (existingSegmentationNameList.get(i).getAttribute("title").trim().equals(data.get("segmentName"))) {
+    }
 
-                switch (action) {
-                    case "delete":
-                        GenericPageActions.moveToElement(existingSegmentationNameList.get(i), data.get("segmentName"));
-                        GenericPageActions.isElementEnabled(segmentationDeleteButton.get(i), "Segment Delete button");
-                        GenericPageActions.actionClick(segmentationDeleteButton.get(i), "Segment Delete button");
-                        popupMessageAction("Yes");
-                        //confirmSegmentDelete("Yes");
-                        break;
-                    case "rename":
-                        GenericPageActions.isElementEnabled(segmentationRenameButton.get(i), "Segment Rename button");
-                        GenericPageActions.actionClick(segmentationRenameButton.get(i), "Segment Rename button");
-                        break;
-                    default:
-                        LogManager.printFailLog("incorrect action " + action);
-                }
+    public WebElement getGivenSegmentWebElement(String selectedSegment) {
+        WebElement element = null;
+        for (int i = 0; existingSegmentationList.size() > i; i++) {
+            if (existingSegmentationList.get(i).findElement(By.xpath("div/div")).getAttribute("title").trim().equals(selectedSegment)) {
+                element = existingSegmentationList.get(i);
                 break;
             }
-
-            if (!(existingSegmentationNameList.size() > i + 1)) {
+            if (!(existingSegmentationList.size() > i + 1)) {
                 i = 0;
                 if (!Boolean.valueOf(nextPage.getAttribute("aria-disabled"))) {
                     nextPage.click();
                 } else {
-                    LogManager.printFailLog("Selected segmentation not found " + data.get("segmentName"));
-                    Assert.fail("Selected segmentation not found " + data.get("segmentName"));
+                    //LogManager.printInfoLog("Selected segmentation not found " + selectedSegment);
                     break;
                 }
 
             }
         }
-
+        return element;
     }
 
     public void confirmSegmentDelete(String action) {
@@ -389,10 +368,10 @@ public class SegmentationPage extends HomePage {
     public void selectSegmentFilters(String selectedSegment, String segmentFiltersOption) {
 
         try {
-             if (!getAvailableSegmentFilterFroSelected().contains(selectedSegment)) {
+            if (!getAvailableSegmentFilterFroSelected().contains(selectedSegment)) {
                 addFilter(selectedSegment);
-             }
-             if (!selectedSegment.equals("Age")) {
+            }
+            if (!selectedSegment.equals("Age")) {
                 GenericPageActions.click(getWebElement(segmentDropDown, selectedSegment), selectedSegment + " dropdown");
                 selectFilterOptionsFromDropDown(segmentFiltersOption);
                 LogManager.printInfoLog(segmentFiltersOption + "  options selected for " + selectedSegment + " " +

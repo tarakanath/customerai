@@ -15,7 +15,7 @@ public class LoginPageSteps {
         this.loginPage = loginPage;
     }
 
-    @When("{string} logged into application, from the file {string} where the sheet is {string} and DataRowNum  is {string}")
+    @When("{string} logged into application get login data from the file {string} where the sheet is {string} and DataRowNum  is {string}")
     public void userLoggedIntoApplicationFromTheFileWhereTheSheetIsAndDataRowNumIs(String userType, String fileName, String sheetName, String rowNum) {
         String log = userType + " logged into application";
         ThreadLocalManager.setStep(ThreadLocalManager.getScenario().createNode("<b>" + log + "</b>"));

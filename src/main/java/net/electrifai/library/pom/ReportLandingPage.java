@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ReportLandingPage extends HomePage {
 
-    @FindBy(xpath ="//div[@class='component_content__NXEzW']/button" )
+    @FindBy(xpath = "//div[@class='component_content__NXEzW']/button")
     List<WebElement> filterCriteria;
     @FindBy(xpath = "//div[@class='component_content__NXEzW']//div[contains(@class,'ant-dropdown') and not(contains(@class,'ant-dropdown-hidden'))]//li")
     List<WebElement> dropDownElements;
@@ -23,18 +23,18 @@ public class ReportLandingPage extends HomePage {
     String logMessage;
 
     public void selectOptionFromGivenDropDown(String dropDown, String option) {
-         try{
-            for(WebElement element:filterCriteria){
-                if(element.getText().contains(dropDown)){
-                    GenericPageActions.moveToElement(element, dropDown+" Dropdown");
+        try {
+            for (WebElement element : filterCriteria) {
+                if (element.getText().contains(dropDown)) {
+                    GenericPageActions.moveToElement(element, dropDown + " Dropdown");
                     selectGivenOptionFromDropDown(option);
                     // below step has been added to avoid synchronization issue
-                    GenericPageActions.moveToElement(userIcon,"user icon");
+                    GenericPageActions.moveToElement(userIcon, "user icon");
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logMessage = "Given drop down is not available";
-            LogManager.printExceptionLog(e,logMessage);
+            LogManager.printExceptionLog(e, logMessage);
             Assert.fail(logMessage);
         }
 
@@ -45,10 +45,10 @@ public class ReportLandingPage extends HomePage {
         try {
 
             //Thread.sleep(1000);
-            Wait.explicitWait(dropDownElements.get(1),"visibility");
+            Wait.explicitWait(dropDownElements.get(1), "visibility");
             for (WebElement element : dropDownElements
             ) {
-                 if (element.getText().trim().equals(option)) {
+                if (element.getText().trim().equals(option)) {
                     GenericPageActions.click(element, "Dropdown option " + option);
                     condition = true;
                     break;

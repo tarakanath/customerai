@@ -77,14 +77,8 @@ public class Hooks extends AbstractTestNGCucumberTests {
 
     @After(order = 0)
     public void afterScenarioFinish(Scenario scenario) throws ConfigurationException, FileNotFoundException {
-        //System.out.println("-----------------End of Scenario-----------------");
-
-        //String featureName = scenario.getUri().toString();
-        //String currentFeature = featureName.split(".*/")[1];
-        //System.out.println(currentFeature);
         String scenarioName = "End of Scenario " + scenario.getName();
         ArrayList<String> ab = new ArrayList<String>();
-
 
         if (scenarioName.contains(",")) {
             scenario.log(scenarioName.split(",")[0]);
@@ -93,14 +87,6 @@ public class Hooks extends AbstractTestNGCucumberTests {
         }
 
         String environment = PropertiesFile.getProperty("testEnvironment.properties").getString("environment");
-        // String testUrl = PropertiesFile.getProperty("testEnvironment.properties").getString("" + environment + ".url");
-        // System.out.println(testUrl);
-        //  ThreadLocalManager.getDriver().get(testUrl);
-        //  WebElement logintitle = ThreadLocalManager.getDriver().findElement(By.xpath("//div[@class='login-card-title']"));
-
-        //String Url = PropertiesFile.getProperty("testEnvironment.properties").getString("" + environment + ".url");
-        //System.out.println(Url);
-        //ThreadLocalManager.getDriver().get(Url);
         List<WebElement> loginAsNonLearner1 = ThreadLocalManager.getDriver().findElements(By.xpath("(//div[@class='common-login-button'])[2]"));
         if (loginAsNonLearner1.size() == 1) {
             LogManager.printInfoLog("Already in common login page");
@@ -118,8 +104,6 @@ public class Hooks extends AbstractTestNGCucumberTests {
 
     @AfterStep
     public void afterStep(Scenario scenario) throws IOException {
-        //System.out.println("Executing after step ");
-
         if (scenario.isFailed()) {
             scenario.attach(Screenshot.getScreenShot(), "image/png", "Screenshot");
             ThreadLocalManager.getStep().fail(MediaEntityBuilder.createScreenCaptureFromBase64String(Screenshot.getBase64ScreenShot()).build());
@@ -131,8 +115,4 @@ public class Hooks extends AbstractTestNGCucumberTests {
 
     }
 
-    /*@After("@smoke")
-    public void afterScanario(Scenario scenario) throws IOException{
-        segmentationPage.doGivenActionOnGivenSegment("delete",segmentName);
-    }*/
 }

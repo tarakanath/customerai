@@ -29,7 +29,7 @@ public class CrossSellPageSteps {
         this.homePage = homePage;
     }
 
-    @And("Select {string} from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    @And("Select {string} filter setup data from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void selectFromTheFileWhereTheSheetIsAndDataRowNumIs(String pageName, String fileName, String sheetName,
                                                                 String dataRowNum) {
         log = "Generate " + pageName + " report for selected segmentation";
@@ -47,6 +47,7 @@ public class CrossSellPageSteps {
         reportLandingPage.selectOptionFromGivenDropDown("Propensity Model", data.get("Propensity"));
         reportLandingPage.selectOptionFromGivenDropDown("Date Range", data.get("Date Range"));
         reportLandingPage.clickOnApplyButton();
+        reportPage.verifyLandedOnReportPage(pageName);
 
     }
 
@@ -86,7 +87,7 @@ public class CrossSellPageSteps {
         reportPage.updateReportSelection(pageName, data);
     }
 
-    @Then("Verify default selection from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    @Then("Verify default selection from the data file {string} where the sheet is {string} and DataRowNum is {string}")
     public void verifyDefaultSelectionFromTheFileWhereTheSheetIsAndDataRowNumIs(String fileName, String sheetName, String dataRowNum) {
         log = "Verify default" + pageName + " report for selected segmentation";
         ThreadLocalManager.setStep(ThreadLocalManager.getScenario().createNode("<b>" + log + "</b>"));
@@ -113,13 +114,13 @@ public class CrossSellPageSteps {
 
     }
 
-    @Then("update and verify customer probability selection from file {string} Where the sheet is {string}")
-    public void updateAndVerifyCustomerProbabilitySelectionFromFileWhereTheSheetIs(String fileName, String sheetName) {
+    @Then("update and verify customer probability selection data from file {string} Where the sheet is {string} from data row {int} to {int}")
+    public void updateAndVerifyCustomerProbabilitySelectionDataFromFileWhereTheSheetIsFromDataRowTo(String fileName, String sheetName, int fromDataRow, int toDataRow) {
         log = "update and verify customer probability selection for " + pageName;
         int dataRowNum = 1;
         ThreadLocalManager.setStep(ThreadLocalManager.getScenario().createNode("<b>" + log + "</b>"));
         fileName = "" + fileName + ".xlsx";
-        for (dataRowNum = 2; dataRowNum < 7; dataRowNum++) {
+        for (dataRowNum = fromDataRow; dataRowNum < toDataRow; dataRowNum++) {
             data = ReadAndWriteExcel.readExcelTabRowNew(excelFilePath, fileName, sheetName, Integer.toString(dataRowNum));
             reportPage.selectCustomerProbability(data.get("Customer Probability"));
             reportPage.verifyCustomerProbabilitySelection(pageName, data);
@@ -176,7 +177,7 @@ public class CrossSellPageSteps {
 
     }
 
-    @Then("Verify {string} filter criteria selection from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    @Then("Verify {string} filter criteria selection from the data file {string} where the sheet is {string} and DataRowNum is {string}")
     public void verifyFilterCriteriaSelectionFromTheFileWhereTheSheetIsAndDataRowNumIs(String pageName, String fileName, String sheetName,
                                                                                        String dataRowNum) {
         log = "Verify segmentation,Propensity,Date Range selection" + pageName;
@@ -212,4 +213,5 @@ public class CrossSellPageSteps {
         reportPage.doGivenActionOnProfile("minimize");
 
     }
+
 }

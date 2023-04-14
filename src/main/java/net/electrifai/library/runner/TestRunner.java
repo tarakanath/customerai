@@ -10,7 +10,7 @@ import io.cucumber.testng.CucumberOptions;
         "html:target/cucumber.html",
         "json:target/cucumber.json",
 },
-        tags = "@smoke11"
+        tags = "@smoke"
 )
 public class TestRunner extends BaseClass {
 

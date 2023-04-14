@@ -183,6 +183,7 @@ public class ReportPage extends ReportLandingPage {
         Assert.assertEquals(driversTitle.getText().trim(), driverTitle);
         Assert.assertEquals(profileMinimizeTitle.getText().split("\\(")[0].trim(), profileTitle);
         LogManager.printInfoLog("Customer probability range selection validated");
+        GenericPageActions.takeScreenShot();
     }
 
     private void verifySelectedCustomerProbability(String expectedCustProb) {
@@ -299,6 +300,8 @@ public class ReportPage extends ReportLandingPage {
                     element.findElement(By.cssSelector(checkbox)).click();
                 }
             }
+            GenericPageActions.scrollToElementView(driverNames.get(4));
+            GenericPageActions.takeScreenShot();
             LogManager.printPassLog(options + " selected");
         } catch (Exception e) {
             e.printStackTrace();
@@ -328,7 +331,7 @@ public class ReportPage extends ReportLandingPage {
         prfileTableColumnNames.removeAll(List.of("Customer Name", "Customer Id"));
         GenericPageActions.compareGivenLists(prfileTableColumnNames, "Avaliable drivers in profile table columns heading",
                 selectedDrivers, "Selected driver in report page");
-        //getprofileTableData(false);
+        GenericPageActions.takeScreenShot();
         doGivenActionOnProfile("minimize");
 
 
@@ -425,12 +428,12 @@ public class ReportPage extends ReportLandingPage {
                     verifyPageCount(totalProfileCount);
                     GenericPageActions.click(pageSizeDropDown, "Page size drop down");
                     Wait.explicitWait(pageSizeDropDownOptions.get(0), "visibility");
+                    GenericPageActions.scrollToElementView(pageSizeDropDown);
+                    GenericPageActions.takeScreenShot();
                     break;
                 }
 
             }
-
-
         }
     }
 
@@ -585,6 +588,7 @@ public class ReportPage extends ReportLandingPage {
         Assert.assertEquals(selectedFilterCriteria.get(0), (data.get("Segmentation")), "expected segmentation not selected");
         Assert.assertEquals(selectedFilterCriteria.get(1), (data.get("Propensity")), "expected propensity not selected");
         Assert.assertEquals(selectedFilterCriteria.get(2), (data.get("Date Range")), "expected propensity not selected");
+        GenericPageActions.takeScreenShot();
         LogManager.printInfoLog(selectedFilterCriteria + "Segemntation, Propensity and Data Range selection validated sycessfully");
 
     }
@@ -594,8 +598,9 @@ public class ReportPage extends ReportLandingPage {
         List<String> temp = Arrays.asList(profileTitle.getText().split("\\n"));
         Assert.assertEquals(temp.get(1).trim(), data.get("Propensity"));
         Assert.assertEquals(temp.get(2).trim(), data.get("Segmentation"));
-        doGivenActionOnProfile("minimize");
         LogManager.printInfoLog("Segementation,Propensity is verified on profile page sucessfully");
+        GenericPageActions.takeScreenShot();
+        doGivenActionOnProfile("minimize");
 
     }
 
@@ -612,6 +617,8 @@ public class ReportPage extends ReportLandingPage {
         LogManager.printInfoLog("Last page (" + lastPageNumber + ") profile count (" + actualLastPageProfilesCount + ") validated sucessfully");
         Assert.assertEquals(Integer.parseInt(selectedProfilePage.getText().trim()), lastPageNumber);
         GenericPageActions.isElementNotEnabled(profilesNextPage, "Next Page button");
+        GenericPageActions.scrollToElementView(profilesPreviousPage);
+        GenericPageActions.takeScreenShot();
 
     }
 
@@ -620,6 +627,8 @@ public class ReportPage extends ReportLandingPage {
         GenericPageActions.click(firstPage, "firstPage");
         Assert.assertEquals(Integer.parseInt(selectedProfilePage.getText().trim()), 1);
         GenericPageActions.isElementNotEnabled(profilesPreviousPage, "Previous Page button");
+        GenericPageActions.scrollToElementView(profilesPreviousPage);
+        GenericPageActions.takeScreenShot();
     }
 
     public void verifyPageNavigationByOneStep(String state) {
@@ -634,6 +643,8 @@ public class ReportPage extends ReportLandingPage {
                 int selectedPageNo = Integer.parseInt(selectedProfilePage.getText().trim());
                 Assert.assertEquals(selectedPageNo, intialPageNo + 1);
                 LogManager.printInfoLog("Navigation to page " + selectedPageNo + " validation sucessfull when profiles window " + state);
+                GenericPageActions.scrollToElementView(profilesPreviousPage);
+                GenericPageActions.takeScreenShot();
                 if (state.equals("expand")) {
                     verifyShowingRecordsText(selectedPageNo);
                 }
@@ -641,20 +652,21 @@ public class ReportPage extends ReportLandingPage {
                 logMessage = "Unable parse the current page number from active page webelement";
                 LogManager.printExceptionLog(e, logMessage);
             }
-            if (i == 3) {
+            if (i == 1) {
                 break;
             }
 
         }
         LogManager.printInfoLog("Next page navigation validation sucessfull");
 
-        for (; 1 < i; i--) {
+        for (; 1 <= i; i--) {
 
             try {
                 int intialPageNo = Integer.parseInt(selectedProfilePage.getText().trim());
                 GenericPageActions.click(profilesPreviousPage, "Previous Page");
                 int selectedPageNo = Integer.parseInt(selectedProfilePage.getText().trim());
                 Assert.assertEquals(selectedPageNo, intialPageNo - 1);
+                GenericPageActions.takeScreenShot();
                 LogManager.printInfoLog("Navigation to page " + selectedPageNo + " validation sucessfull when profiles window " + state);
                 if (state.equals("expand")) {
                     verifyShowingRecordsText(selectedPageNo);
@@ -689,6 +701,7 @@ public class ReportPage extends ReportLandingPage {
             GenericPageActions.isElementDisplayedWithExpectedText(activeCampaignsHeading, "Active Campaigns", "Active Campaigns: 2");
             GenericPageActions.isElementDisplayedWithExpectedText(transHeading, "Transactions Heading", "Transactions");
             GenericPageActions.isElementDisplayedWithExpectedText(oppotunityHeading, "Opportunity Heading", "Opportunity");
+            GenericPageActions.takeScreenShot();
             GenericPageActions.click(custProfileClose, "customer Profile Close");
             GenericPageActions.isElementDisplayed(custProbCheckBoxes.get(0), "Customer Probability checkbox");
             LogManager.printInfoLog("Customer profile view page validated sucessfully when profiles window " + state);
@@ -723,6 +736,7 @@ public class ReportPage extends ReportLandingPage {
                     selectedStar = Integer.parseInt(tableData.get(0).get(driver));
                     System.out.println("stars options " + driverFilterDropDownElements.size());
                     GenericPageActions.click(driverFilterDropDownElements.get(5 - selectedStar), selectedStar + " star");
+                    GenericPageActions.takeScreenShot();
                     break;
                 }
             }
@@ -731,6 +745,7 @@ public class ReportPage extends ReportLandingPage {
     }
 
     private void validateTableDataForDriverFilter(int selectedStar, List<String> driverList) {
+        GenericPageActions.takeScreenShot();
         List<TreeMap<String, String>> tableData = getprofileTableData(true);
         for (String driver : driverList) {
             for (Map<String, String> row : tableData) {
@@ -739,5 +754,10 @@ public class ReportPage extends ReportLandingPage {
         }
 
         LogManager.printInfoLog(driverList + " filter validation sucessfull");
+    }
+
+    public void verifyLandedOnReportPage(String pageName) {
+        Wait.explicitWait(reportTitle, "visibility");
+        GenericPageActions.isElementDisplayedWithExpectedText(reportTitle, "Report Title ", pageName);
     }
 }
