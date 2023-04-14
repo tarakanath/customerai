@@ -27,9 +27,9 @@ public class LoginPageSteps {
         loginPage.logout();
     }
 
-    @Given("Customer AI application is up.")
+    @Given("User landed on Customer AI Application")
     public void customerAIApplicationIsUp() {
-        String log = " Customer AI application is up.";
+        String log = "User landed on Customer AI Application";
         ThreadLocalManager.setStep(ThreadLocalManager.getScenario().createNode("<b>" + log + "</b>"));
         loginPage.launchApplication();
 

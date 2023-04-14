@@ -2,8 +2,8 @@
 Feature: Cross-sell page validation
 
   @smoke
-  Scenario: Create segmentation
-    Given Customer AI application is up.
+  Scenario: Login into CustomerAI application and Create segmentation
+    Given User landed on Customer AI Application
     And "admin" logged into application, from the file "loginPage" where the sheet is "LoginCredentials" and DataRowNum  is "1"
     When Generate "Segmentation" filter from the file "Segmentation" where the sheet is "Segmentation" and DataRowNum  is "1"
     Then validate created segment appeared in segment list

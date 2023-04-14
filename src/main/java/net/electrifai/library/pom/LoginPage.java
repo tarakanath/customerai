@@ -8,6 +8,8 @@ import org.testng.Assert;
 
 import java.util.Map;
 
+import static net.electrifai.library.utils.LogManager.scenario;
+
 public class LoginPage extends HomePage {
     public static Map<String, String> data = null;
     private static String CURL = null;
@@ -22,6 +24,7 @@ public class LoginPage extends HomePage {
     WebElement applicationName;
     @FindBy(xpath = "//h2[@class='login_welcome__8MuGK']")
     WebElement welcomeMessage;
+
     public LoginPage() {
 
     }
@@ -30,8 +33,12 @@ public class LoginPage extends HomePage {
         try {
             String environment = PropertiesFile.getProperty("testEnvironment.properties").getString("environment");
             //ThreadLocalManager.getDriver().get(PropertiesFile.getProperty("testEnvironment.properties").getString("" + environment + ".url"));
-            GenericPageActions.isElementDisplayedWithExpectedText(applicationName,"Application Name","CustomerAi");
-            LogManager.printInfoLog("Current application URL " +ThreadLocalManager.getDriver().getCurrentUrl());
+            LogManager.printInfoLog("User successfully launched url " + ThreadLocalManager.getDriver().getCurrentUrl());
+            GenericPageActions.isElementDisplayed(userName_textBox, "userName_textBox");
+            GenericPageActions.isElementDisplayed(password_textBox, "password_textBox");
+            GenericPageActions.isElementDisplayed(loginButton, "Login button");
+            Assert.assertEquals(applicationName.getText(), "CustomerAi", "Application ICON is missing");
+            LogManager.printInfoLog("User successfully landed on Customer AI Login Page");
 
         } catch (Exception e) {
             e.printStackTrace();
