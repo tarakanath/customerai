@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.electrifai.library.utils.LogManager.scenario;
+
 public class GenericPageActions {
     /**
      * Method to click on element  using selenium
@@ -528,5 +530,9 @@ public class GenericPageActions {
            LogManager.printExceptionLog(e,logMessage);
            Assert.fail(logMessage);
        }
+    }
+
+    public static void takeScreenShot(String screenShotName) {
+        scenario.attach(Screenshot.getScreenShot(), "image/png", screenShotName);
     }
 }
