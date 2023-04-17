@@ -1,5 +1,5 @@
-@upsell
-Feature: Up-sell page validation
+@customerchrun
+Feature: Customer Churn page validation
 
   @smoke
   Scenario: Login into CustomerAI application and Create segmentation
@@ -10,18 +10,18 @@ Feature: Up-sell page validation
 
   @smoke
   Scenario: Verify all features on Cross-sell report page
-    When Select "Product Up-Sell" filter setup data from the file "up_sell" where the sheet is "up_sell_Filter" and DataRowNum is "1"
-    Then Verify "Product Up-Sell" filter criteria selection from the data file "up_sell" where the sheet is "up_sell_Filter" and DataRowNum is "1"
-    Then Verify default selection from the data file "up_sell" where the sheet is "up_Sell_Report_EtoE" and DataRowNum is "1"
-    Then update and verify customer probability selection data from file "up_sell" Where the sheet is "up_Sell_Report_EtoE" from data row 2 to 7
+    When Select "Customer Churn" filter setup data from the file "customer_churn" where the sheet is "customer_churn_Filter" and DataRowNum is "1"
+    Then Verify "Customer Churn" filter criteria selection from the data file "customer_churn" where the sheet is "customer_churn_Filter" and DataRowNum is "1"
+    Then Verify default selection from the data file "customer_churn" where the sheet is "customer_churn_Report_EtoE" and DataRowNum is "1"
+    Then update and verify customer probability selection data from file "customer_churn" Where the sheet is "customer_churn_Report_EtoE" from data row 2 to 7
     Then verify drivers filter in customer profile table.
     Then verify customer profile info page when profile window "minimize"
     Then verify customer profile info page when profile window "expand"
     Then verify customer profile pagination with "minimize"
     Then verify customer profile pagination with "expand"
     Then update and verify driver selection in customer profile table
-    When update "Product Up-Sell" filter criteria from the file "up_sell" where the sheet is "up_sell_Filter" and DataRowNum is "2"
-    Then Verify "Product Up-Sell" filter criteria selection from the data file "up_sell" where the sheet is "up_sell_Filter" and DataRowNum is "2"
+    When update "Customer Churn" filter criteria from the file "customer_churn" where the sheet is "customer_churn_Filter" and DataRowNum is "2"
+    Then Verify "Customer Churn" filter criteria selection from the data file "customer_churn" where the sheet is "customer_churn_Filter" and DataRowNum is "2"
 
   @smoke
   Scenario: Delete segmentation and logout application

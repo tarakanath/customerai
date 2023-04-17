@@ -211,6 +211,9 @@ public class CrossSellPageSteps {
         reportPage.doGivenActionOnProfile("expand");
         reportPage.setupFilterForSelectedDrivers(selectedDriver);
         reportPage.doGivenActionOnProfile("minimize");
+        //to clear driver filter.
+        reportPage.selectDrivers(selectedDriver);
+        reportPage.selectDrivers(driversList);
 
     }
 
