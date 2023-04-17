@@ -531,8 +531,8 @@ public class GenericPageActions {
         }
     }
 
-    public static void takeScreenShot() {
-        String screenShotName = "Screenshot" + generateRandomName(10);
+    public static void takeScreenShot(String screenShotName) {
+        screenShotName = "Screenshot_" + screenShotName;
         scenario.attach(Screenshot.getScreenShot(), "image/png", screenShotName);
         LogManager.printInfoLog("Screen shot captured with image name " + screenShotName);
     }
