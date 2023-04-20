@@ -4,7 +4,7 @@ Feature: Customer Overview page validation.
   Scenario: Login into Customer AI with valida credentials.
     Given Customer AI application is up.
     When "admin" logged into application, from the file "loginPage" where the sheet is "LoginCredentials" and DataRowNum  is "1"
-    Then Validate landed on "Customer Overview" page.
+    #Then Validate landed on "Customer Overview" page.
 
   Scenario: Verify my products on customer overview page.
     When Validate landed on "Customer Overview" page.

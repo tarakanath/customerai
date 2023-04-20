@@ -1,13 +1,17 @@
 package net.electrifai.setpdefinations;
 
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import net.electrifai.library.pom.CustomerOverviewPage;
 
 public class CustomerOverViewSteps {
 
-    @Then("Validate landed on {string} page.")
+    CustomerOverviewPage COPage;
+
+    @When("Validate landed on {string} page.")
     public void validateLandedOnPage(String string) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+
+       COPage.validatePageTitle(string);
     }
 
     @Then("validate my products list from the file {string} where the sheet is {string}")
