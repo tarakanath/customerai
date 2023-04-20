@@ -53,16 +53,15 @@ public class SegmentPageSteps {
 
     @Then("validate created segment appeared in segment list")
     public void validateCreatedSegmentAppearedInSegmentList() {
-        //segmentName="AK_AL_AR";
         String log = "Verify given segment from current segment list";
         ThreadLocalManager.setStep(ThreadLocalManager.getScenario().createNode("<b>" + log + "</b>"));
-        segmentationPage.verifyGivenSegmentFromCurrentSegmentList(segmentName);
+        segmentationPage.verifyGivenSegmentAvailable(segmentName);
     }
 
 
 
 
-    @And("Generate {string} filter from the file {string} where the sheet is {string} and DataRowNum  is {string}")
+    @And("Generate {string} filter get test data from the file {string} where the sheet is {string} and DataRowNum  is {string}")
     public void generateFilterFromTheFileWhereTheSheetIsAndDataRowNumIs(String pageName, String fileName, String sheetName, String dataRowNum) {
 
         String log = "Segmentation filter Selection";
@@ -90,11 +89,12 @@ public class SegmentPageSteps {
 
     }
 
-    @Then("validate segment deleted")
+    @Then("Verify segment deleted")
     public void validateSegmentDeleted() {
+        segmentationPage.verifyGivenSegmentNotFound(segmentName);
     }
 
-    @When("{string} segmentation from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    @When("{string} segmentation from the data file {string} where the sheet is {string} and DataRowNum is {string}")
     public void segmentationFromTheFileWhereTheSheetIsAndDataRowNumIs(String action, String fileName, String sheetName, String dataRowNum) {
         String log = "Segmentation filter Selection";
         fileName = "" + fileName + ".xlsx";

@@ -10,6 +10,7 @@ import net.electrifai.library.utils.ThreadLocalManager;
 import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static net.electrifai.library.pom.HomePage.*;
 
@@ -28,7 +29,7 @@ public class CrossSellPageSteps {
         this.homePage = homePage;
     }
 
-    @And("Select {string} from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    @And("Select {string} filter setup data from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void selectFromTheFileWhereTheSheetIsAndDataRowNumIs(String pageName, String fileName, String sheetName,
                                                                 String dataRowNum) {
         log = "Generate " + pageName + " report for selected segmentation";
@@ -46,6 +47,7 @@ public class CrossSellPageSteps {
         reportLandingPage.selectOptionFromGivenDropDown("Propensity Model", data.get("Propensity"));
         reportLandingPage.selectOptionFromGivenDropDown("Date Range", data.get("Date Range"));
         reportLandingPage.clickOnApplyButton();
+        reportPage.verifyLandedOnReportPage(pageName);
 
     }
 
@@ -85,7 +87,7 @@ public class CrossSellPageSteps {
         reportPage.updateReportSelection(pageName, data);
     }
 
-    @Then("Verify default selection from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    @Then("Verify default selection from the data file {string} where the sheet is {string} and DataRowNum is {string}")
     public void verifyDefaultSelectionFromTheFileWhereTheSheetIsAndDataRowNumIs(String fileName, String sheetName, String dataRowNum) {
         log = "Verify default" + pageName + " report for selected segmentation";
         ThreadLocalManager.setStep(ThreadLocalManager.getScenario().createNode("<b>" + log + "</b>"));
@@ -112,13 +114,13 @@ public class CrossSellPageSteps {
 
     }
 
-    @Then("update and verify customer probability selection from file {string} Where the sheet is {string}")
-    public void updateAndVerifyCustomerProbabilitySelectionFromFileWhereTheSheetIs(String fileName, String sheetName) {
+    @Then("update and verify customer probability selection data from file {string} Where the sheet is {string} from data row {int} to {int}")
+    public void updateAndVerifyCustomerProbabilitySelectionDataFromFileWhereTheSheetIsFromDataRowTo(String fileName, String sheetName, int fromDataRow, int toDataRow) {
         log = "update and verify customer probability selection for " + pageName;
         int dataRowNum = 1;
         ThreadLocalManager.setStep(ThreadLocalManager.getScenario().createNode("<b>" + log + "</b>"));
         fileName = "" + fileName + ".xlsx";
-        for (dataRowNum = 2; dataRowNum < 7; dataRowNum++) {
+        for (dataRowNum = fromDataRow; dataRowNum < toDataRow; dataRowNum++) {
             data = ReadAndWriteExcel.readExcelTabRowNew(excelFilePath, fileName, sheetName, Integer.toString(dataRowNum));
             reportPage.selectCustomerProbability(data.get("Customer Probability"));
             reportPage.verifyCustomerProbabilitySelection(pageName, data);
@@ -145,7 +147,15 @@ public class CrossSellPageSteps {
 
     @Then("verify customer profile pagination with {string}")
     public void verifyCustomerProfilePaginationWith(String state) {
+        if(!state.equals("minimize"))
+            reportPage.doGivenActionOnProfile(state);
         reportPage.verifyCustomerProfilePaginationWith(state);
+        reportPage.verifyNavigationToLastPage(state);
+        reportPage.VerifyNavigationToFirstPage(state);
+        reportPage.verifyPageNavigationByOneStep(state);
+        if(state.equals("expand")) // to minimize the profile for next step validation.
+            reportPage.doGivenActionOnProfile("minimize");
+
     }
 
     @Then("update {string} filter criteria from the file {string} where the sheet is {string} and DataRowNum is {string}")
@@ -167,7 +177,7 @@ public class CrossSellPageSteps {
 
     }
 
-    @Then("Verify {string} filter criteria selection from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    @Then("Verify {string} filter criteria selection from the data file {string} where the sheet is {string} and DataRowNum is {string}")
     public void verifyFilterCriteriaSelectionFromTheFileWhereTheSheetIsAndDataRowNumIs(String pageName, String fileName, String sheetName,
                                                                                        String dataRowNum) {
         log = "Verify segmentation,Propensity,Date Range selection" + pageName;
@@ -182,12 +192,29 @@ public class CrossSellPageSteps {
         reportPage.verifySelectedFilterCtriteriaInProfileTable(data);
     }
 
-    @Then("verify profile page navigation with {string}")
-    public void verifyProfilePageNavigationWith(String state) {
+    @Then("verify customer profile info page when profile window {string}")
+    public void verifyCustomerProfileInfoPageWhenProfileWindow(String state) {
         if(!state.equals("minimize"))
             reportPage.doGivenActionOnProfile(state);
-        reportPage.verifyNavigateToLastPage(state);
-        reportPage.VerifyNavigateToFirstPage(state);
-        //reportPage.verifyPageNavigationByOneStep(state);
+        reportPage.validateCustomerProfileToViewWhenProfileWindow(state);
+        if(state.equals("expand"))
+            reportPage.doGivenActionOnProfile("minimize");
     }
+
+    @Then("verify drivers filter in customer profile table.")
+    public void verifyDriversFilterInCustomerProfileTable() {
+        List<String> driversList = new ArrayList<>(Arrays.asList("Driver 1", "Driver 2", "Driver 3", "Driver 4", "Driver 5"));
+        Random ran = new Random();
+        List<String> selectedDriver=new ArrayList<>();
+        int i=ran.nextInt(5);
+        selectedDriver.add(driversList.get(i));
+        reportPage.doGivenActionOnProfile("expand");
+        reportPage.setupFilterForSelectedDrivers(selectedDriver);
+        reportPage.doGivenActionOnProfile("minimize");
+        //to clear driver filter.
+        reportPage.selectDrivers(selectedDriver);
+        reportPage.selectDrivers(driversList);
+
+    }
+
 }

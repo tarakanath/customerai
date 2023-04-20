@@ -31,50 +31,8 @@ public class CustomerOverviewPage extends HomePage{
 
 
 
+    @FindBy(xpath = "//div[@class='customerOverview_title__o_i4H']/span")
+    WebElement myProductsHeadings;
 
-    public void validatePageTitle(String string) {
-        try {
-            GenericPageActions.isElementDisplayed(CO_Heading, "Customer Overview");
-        } catch (Exception e) {
-            e.printStackTrace();
-            String logMessage = "could not launch page customer overview";
-            LogManager.printExceptionLog(e, logMessage);
-            Assert.fail(e.getMessage());
-        }
-    }
 
-    public void validateProductName(){
-        for (WebElement element : product_Name) {
-            String product_Match = element.getText();
-                if (product_Match.contains((CharSequence) product_Name)) {
-                    System.out.println("Match found for: " + product_Name);
-                    break;
-                }
-        }
-    }
-
-    public void percentageCheck(){
-        for (WebElement element : percentage_change) {
-            String value = element.getText();
-            int intValue = Integer.parseInt(value);
-            // Check if the value is greater than zero
-            if (intValue > 0) {
-                element.isDisplayed();
-                System.out.println("The percentage change displayed are: " + percentage_change);
-            }
-        }
-    }
-    public void valueCheck(){
-        for (WebElement element : activeInactiveNumber) {
-            String value = element.getText();
-            int intValue = Integer.parseInt(value);
-            // Check if the value is greater than zero
-            if (intValue > 0) {
-                element.isDisplayed();
-                System.out.println("The numbers displayed are: " + activeInactiveNumber);
-            }
-        }
-    }
 }
-
-
