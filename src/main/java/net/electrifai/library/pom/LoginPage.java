@@ -59,7 +59,10 @@ public class LoginPage extends HomePage {
             GenericPageActions.enterTextOnElement(userName_textBox, "userName_textBox", data.get("UserName"));
             GenericPageActions.enterTextOnElement(password_textBox, "password_textBox", data.get("Password"));
             GenericPageActions.click(loginButton, "loginButton");
-            GenericPageActions.isElementDisplayed(pageHeading, "Page Heading");
+            Assert.assertEquals(pageHeading.getText(),"Customer Overview");
+            LogManager.printInfoLog("User landed on "+pageHeading.getText()+" page.");
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
