@@ -1,13 +1,24 @@
 package net.electrifai.setpdefinations;
 
 import io.cucumber.java.en.Then;
+import net.electrifai.library.pom.CustomerOverviewPage;
+import net.electrifai.library.utils.LogManager;
+import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static net.electrifai.library.pom.HomePage.projectPath;
+import static net.electrifai.library.pom.HomePage.property;
 
 public class CustomerOverViewSteps {
 
-    @Then("Validate landed on {string} page.")
-    public void validateLandedOnPage(String string) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    CustomerOverviewPage COPage;
+    String excelFilePath = projectPath + property.getString("testDataPath");
+    public static Map<String, String> data = null;
+    public CustomerOverViewSteps(CustomerOverviewPage COPage){
+        this.COPage = COPage;
     }
 
     @Then("validate my products list from the file {string} where the sheet is {string}")
@@ -32,17 +43,28 @@ public class CustomerOverViewSteps {
         throw new io.cucumber.java.PendingException();
     }
 
-    @Then("Validate three category customer tiles from the file {string} where the sheet is {string}")
-    public void validateThreeCategoryCustomerTilesFromTheFileWhereTheSheetIs(String string, String string2) {
-        // validate Total, active, newly boarding customers tiles.
-        // validate each tile title
-        throw new io.cucumber.java.PendingException();
+    @Then("Validate three top category customer tiles from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    public void validateThreeTopCategoryCustomerTilesFromTheFileWhereTheSheetIs( String fileName, String sheetName, String dataRowNum) {
+        COPage.customerTitleHeading(fileName, sheetName, dataRowNum);
+    }
+    @Then("Validate three bottom category customer tiles from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    public void validateThreeBottomCategoryCustomerTilesFromTheFileWhereTheSheetIsAndDataRowNumIs( String fileName, String sheetName, String dataRowNum) {
+        COPage.getTopTitle();
+        COPage.customerBottomHeading(fileName,sheetName,dataRowNum);
+
+
+    }
+    @Then("Validate CustomerCount is positive")
+    public void validateCustomerCountIsPositive() {
+        COPage.countCheck() ;
     }
 
-    @Then("validate three category customers data.")
-    public void validateThreeCategoryCustomersData() {
-        // validate data from all three customer tiles.
-        throw new io.cucumber.java.PendingException();
+    @Then("Validate percentage")
+    public void validatePercentage() {
+        COPage.percentageCount();
     }
-
+    @Then("Validate total customer count")
+    public void validateTotalCustomerCount() {
+        COPage.totalCount();
+    }
 }
