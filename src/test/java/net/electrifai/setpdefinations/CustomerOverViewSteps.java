@@ -3,31 +3,51 @@ package net.electrifai.setpdefinations;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.electrifai.library.pom.CustomerOverviewPage;
+import net.electrifai.library.utils.GenericPageActions;
+import net.electrifai.library.utils.LogManager;
+import net.electrifai.library.utils.ThreadLocalManager;
+import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
+import org.junit.Assert;
+import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static net.electrifai.library.pom.HomePage.projectPath;
+import static net.electrifai.library.pom.HomePage.property;
 
 public class CustomerOverViewSteps {
 
     CustomerOverviewPage COPage;
+    String excelFilePath = projectPath + property.getString("testDataPath");
+    public static Map<String, String> data = null;
 
-    @When("Validate landed on {string} page.")
-    public void validateLandedOnPage(String string) {
-
-       COPage.validatePageTitle(string);
+    public CustomerOverViewSteps(CustomerOverviewPage COPage){
+        this.COPage = COPage;
     }
 
-    @Then("validate my products list from the file {string} where the sheet is {string}")
-    public void validateMyProductsListFromTheFileWhereTheSheetIs(String string, String string2) {
-
-        //verify available products list.
-        throw new io.cucumber.java.PendingException();
+    @Then("validate my products list from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    public void validateMyProductsListFromTheFileWhereTheSheetIsandDataRowNumIs(String fileName, String sheetName,String dataRowNum) {
+           COPage.getProductName(fileName,sheetName,dataRowNum);
     }
 
-    @Then("validate my products search")
-    public void validateMyProductsSearch() {
-
-        // validate products search with exact and regular expression.
-        //Product list filtered out according to search criteria.
-        throw new io.cucumber.java.PendingException();
+    @Then("Enter product name from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    public void validateMyProductsSearch(String fileName, String sheetName,String dataRowNum ) {
+            COPage.searchProduct(fileName, sheetName, dataRowNum);
     }
+
+    @Then("validate potential customers for product from the file {string} where the sheet is {string} and DataRowNum is {string}")
+    public void validatePotentialCustomersForProduct(String fileName, String sheetName,String dataRowNum ) {
+        COPage.reachCustomerLink(fileName,sheetName,dataRowNum);
+    }
+
+    @Then("validate data for the product widget")
+    public void validateDataForProductWidget(){
+        COPage.getDataCountFromProductWidget();
+    }
+
 
     @Then("validate navigation to {string} page from my products")
     public void validateNavigationToPageFromMyProducts(String string) {
