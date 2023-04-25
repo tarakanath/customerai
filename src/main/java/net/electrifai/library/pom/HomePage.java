@@ -70,36 +70,42 @@ public class HomePage {
             case "Segmentation":
                 GenericPageActions.click(segmentation, "Segmentation");
                 Wait.explicitWaitTextVerification(pageHeading, "Segmentation");
-                GenericPageActions.isElementDisplayedWithExpectedText(pageHeading, "Page Heading", pageName);
+                Assert.assertEquals(pageHeading.getText(), pageName);
+                LogManager.printInfoLog("User landed on " + pageHeading.getText() + " page.");
                 break;
 
             case "Product Up-Sell":
                 GenericPageActions.click(upsell, "Product_Up_Sell");
                 Wait.explicitWaitTextVerification(pageHeading, "Product Up-Sell");
-                GenericPageActions.isElementDisplayedWithExpectedText(pageHeading, "Page Heading", pageName);
+                Assert.assertEquals(pageHeading.getText(), pageName);
+                LogManager.printInfoLog("User landed on " + pageHeading.getText() + " page.");
                 break;
 
             case "Product Cross-Sell":
                 GenericPageActions.click(crossSell, "Product_Cross_Sell");
                 Wait.explicitWaitTextVerification(pageHeading, "Product Cross-Sell");
-                GenericPageActions.isElementDisplayedWithExpectedText(pageHeading, "Page Heading", pageName);
+                Assert.assertEquals(pageHeading.getText(), pageName);
+                LogManager.printInfoLog("User landed on " + pageHeading.getText() + " page.");
                 break;
 
             case "Customer Churn":
                 GenericPageActions.click(customerChurn, "Customer_Churn");
                 Wait.explicitWaitTextVerification(pageHeading, "Customer Churn");
-                GenericPageActions.isElementDisplayedWithExpectedText(pageHeading, "Page Heading", pageName);
+                Assert.assertEquals(pageHeading.getText(), pageName);
+                LogManager.printInfoLog("User landed on " + pageHeading.getText() + " page.");
                 break;
 
             case "Customer Overview":
                 GenericPageActions.click(customerOverview, "Customer_Overview");
                 Wait.explicitWaitTextVerification(pageHeading, "Customer Overview");
-                GenericPageActions.isElementDisplayedWithExpectedText(pageHeading, "Page Heading", pageName);
+                Assert.assertEquals(pageHeading.getText(), pageName);
+                LogManager.printInfoLog("User landed on " + pageHeading.getText() + " page.");
                 break;
             case "Campaigns":
                 GenericPageActions.click(customerOverview, "Customer_Overview");
                 Wait.explicitWaitTextVerification(pageHeading, "Campaigns");
-                GenericPageActions.isElementDisplayedWithExpectedText(pageHeading, "Page Heading", pageName);
+                Assert.assertEquals(pageHeading.getText(), pageName);
+                LogManager.printInfoLog("User landed on " + pageHeading.getText() + " page.");
                 break;
 
             default:
@@ -120,5 +126,10 @@ public class HomePage {
         return ThreadLocalManager.getDriver().findElement(By.xpath(xpath));
     }
 
+    public void verifyUserLandedOnGivenPage(String expectedPage) {
+        Assert.assertEquals(getPageHeading(), expectedPage, "User not landed on " + expectedPage);
+        String logMessage = "User successfully landed on " + expectedPage;
+        LogManager.printInfoLog(logMessage);
+    }
 
 }

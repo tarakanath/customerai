@@ -73,4 +73,11 @@ public class ReportLandingPage extends HomePage {
         GenericPageActions.click(applyFiltersButton, "apply filter button");
     }
 
+    public void verifyPropensitySelection(String expectedPropensity) {
+        Assert.assertEquals(filterCriteria.get(1).getText().trim(), expectedPropensity, expectedPropensity + " not selected");
+        String logMessage = "Propensity " + expectedPropensity + " selection validated successfully";
+        LogManager.printInfoLog(logMessage);
+
+    }
+
 }
