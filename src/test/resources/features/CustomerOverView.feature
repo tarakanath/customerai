@@ -13,12 +13,11 @@ Feature: Customer Overview page validation.
 #    Then validate navigation to "Product Cross-Sell" page from my products
 
   Scenario: Verify customer data.
-    And Navigate to "Customer Overview" page
-    Then Validate three top category customer tiles from the file "CustomerOverview" where the sheet is "customerData" and DataRowNum is "1"
-    Then Validate three bottom category customer tiles from the file "CustomerOverview" where the sheet is "Sheet1" and DataRowNum is "1"
-    Then Validate CustomerCount is positive
-    Then Validate percentage
-    Then Validate total customer count
+    Then Validate three top category customer tiles from the file "Customer_Overview" where the sheet is "customerData" and DataRowNum is "1"
+    Then Validate three bottom category customer tiles from the file "Customer_Overview" where the sheet is "Sheet1" and DataRowNum is "1"
+    Then Validate customer stats from Customer Overview Page are positive
+    Then Validate Active and Newly Onboarded Customers Percentage from UI
+    Then Validate total count of Active and Inactive customers
 
 
 

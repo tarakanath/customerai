@@ -42,7 +42,6 @@ public class CustomerOverViewSteps {
         // verify respective propensity selected by default according to products selection.
         throw new io.cucumber.java.PendingException();
     }
-
     @Then("Validate three top category customer tiles from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void validateThreeTopCategoryCustomerTilesFromTheFileWhereTheSheetIs( String fileName, String sheetName, String dataRowNum) {
         COPage.customerTitleHeading(fileName, sheetName, dataRowNum);
@@ -51,20 +50,17 @@ public class CustomerOverViewSteps {
     public void validateThreeBottomCategoryCustomerTilesFromTheFileWhereTheSheetIsAndDataRowNumIs( String fileName, String sheetName, String dataRowNum) {
         COPage.getTopTitle();
         COPage.customerBottomHeading(fileName,sheetName,dataRowNum);
-
-
     }
-    @Then("Validate CustomerCount is positive")
-    public void validateCustomerCountIsPositive() {
-        COPage.countCheck() ;
-    }
-
-    @Then("Validate percentage")
-    public void validatePercentage() {
-        COPage.percentageCount();
-    }
-    @Then("Validate total customer count")
-    public void validateTotalCustomerCount() {
+    @Then("Validate total count of Active and Inactive customers")
+    public void validateTotalCountOfActiveAndInactiveCustomers() {
         COPage.totalCount();
     }
-}
+    @Then("Validate Active and Newly Onboarded Customers Percentage from UI")
+    public void validateActiveAndNewlyOnboardedCustomersPercentageFromUI() {
+            COPage.percentageCount();
+        }
+    @Then("Validate customer stats from Customer Overview Page are positive")
+    public void validateCustomerStatsFromCustomerOverviewPageArePositive() {
+        COPage.countCheck();
+    }
+    }
