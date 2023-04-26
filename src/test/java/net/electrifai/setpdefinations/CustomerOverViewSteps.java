@@ -35,7 +35,6 @@ public class CustomerOverViewSteps {
         //Product list filtered out according to search criteria.
         throw new io.cucumber.java.PendingException();
     }
-
     @Then("validate navigation to {string} page from my products")
     public void validateNavigationToPageFromMyProducts(String string) {
         // verify navigation to cross-sell page when clicked on  "Reach potential customer"
