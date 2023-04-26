@@ -52,7 +52,8 @@ public class CustomerOverviewPage extends HomePage {
             e.printStackTrace();
             String logMessage = "Value doesn't match";
             LogManager.printExceptionLog(e, logMessage);
-        }}
+        }
+    }
     public void customerTitleHeading(String fileName, String sheetName, String dataRowNum) {
         fileName = "" + fileName + ".xlsx";
         data = ReadAndWriteExcel.readExcelTabRowNew(excelFilePath, fileName, sheetName, dataRowNum);
@@ -124,7 +125,6 @@ public class CustomerOverviewPage extends HomePage {
             Assert.fail(logMessage);
         }
     }
-
     public void percentageCount() {
         String activeValue = activeCount.getText();
         int num1 = Integer.parseInt(activeValue.replaceAll(",", ""));
