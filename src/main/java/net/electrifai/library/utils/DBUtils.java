@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DBUtils {
-    static Connection con;
-    static List<String> SQLDataset = new ArrayList<String>();
-    static List<Map<String, String>> data = new ArrayList<>();
-    static Statement stmt;
+    private static Connection con;
+    private static Statement stmt;
 
     private static void initDBConnection() {
         try {
@@ -20,6 +18,7 @@ public class DBUtils {
             String dbPassword = PropertiesFile.getProperty("testEnvironment.properties").getString("dbPassword");
             con = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
             stmt = con.createStatement();
+            LogManager.printInfoLog("DB Connection initiated");
         } catch (Exception e) {
             String log = " DB Connection failed";
             LogManager.printExceptionLog(e, log);
@@ -28,9 +27,9 @@ public class DBUtils {
     }
 
     public static List<String> getGivenColumnValueFromStatement(String queryStatement, String columnName) {
+        List<String> SQLDataset = new ArrayList<String>();
         try {
-            SQLDataset.clear();
-            //DBUtils.initDBConnection();
+            DBUtils.initDBConnection();
             ResultSet resultSet = stmt.executeQuery(queryStatement);
             while (resultSet.next()) {
                 SQLDataset.add(resultSet.getString(columnName));
@@ -38,17 +37,17 @@ public class DBUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        DBUtils.closeConnection();
         return SQLDataset;
     }
 
-    public static List<Map<String, String>> getDataFromStatement(String queryStatement, String columnName) {
+    public static List<Map<String, String>> getDataFromStatement(String queryStatement) {
+        List<Map<String, String>> data = new ArrayList<>();
         try {
             Map<String, String> row;
-            data.clear();
             DBUtils.initDBConnection();
             ResultSet resultSet = stmt.executeQuery(queryStatement);
             ResultSetMetaData s1 = resultSet.getMetaData();
-            String s2 = s1.getColumnLabel(1);
             int i = s1.getColumnCount();
             while (resultSet.next()) {
                 row = new HashMap<>();
@@ -56,11 +55,11 @@ public class DBUtils {
                     row.put(s1.getColumnLabel(j), resultSet.getString(s1.getColumnLabel(j)));
                 }
                 data.add(row);
-
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        DBUtils.closeConnection();
         return data;
     }
 
@@ -68,6 +67,7 @@ public class DBUtils {
         try {
             if (stmt != null) {
                 stmt.close();
+                LogManager.printInfoLog("DB Connection closed");
             }
         } catch (Exception e) {
             String log = "Connection closed failed";

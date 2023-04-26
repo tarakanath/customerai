@@ -104,4 +104,9 @@ public class SegmentPageSteps {
         segmentationPage.doGivenActionOnGivenSegment(action, data);
 
     }
+
+    @And("Verify existing segments with  database")
+    public void verifyExistingSegmentsWithDatabase() {
+        segmentationPage.verifyExistingSegmentsWithDB();
+    }
 }
