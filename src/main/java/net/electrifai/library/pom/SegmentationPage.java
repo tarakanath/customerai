@@ -1,10 +1,11 @@
 package net.electrifai.library.pom;
 
-import net.electrifai.library.utils.GenericPageActions;
-import net.electrifai.library.utils.LogManager;
+import net.electrifai.library.utils.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import java.util.*;
@@ -400,5 +401,31 @@ public class SegmentationPage extends HomePage {
             LogManager.printExceptionLog(e, logMessage);
             Assert.fail(e.getMessage());
         }
+    }
+
+    public void verifyExistingSegmentsWithDB() {
+        List<String> actualSegments = getExistingSegments();
+        String stmt = "SELECT * FROM customerengagementqa.segments  where status='executed' order by created_on DESC;";
+        List<Map<String, String>> data = DBUtils.getDataFromStatement(stmt);
+        for (int i = 0; i < actualSegments.size(); i++) {
+            Assert.assertEquals(actualSegments.get(i), data.get(i).get("segment_name"), "Existing segment validation failed");
+        }
+        LogManager.printInfoLog("Existing segment DB validation completed successfully ");
+    }
+
+    private List<String> getExistingSegments() {
+        boolean condition = true;
+        List<String> segments = new ArrayList<>();
+        do {
+            for (WebElement webElement : existingSegmentationList) {
+                segments.add(webElement.findElement(By.xpath("div/div")).getAttribute("title"));
+            }
+            if (!Boolean.parseBoolean(nextPage.getAttribute("aria-disabled"))) {
+                nextPage.click();
+            } else {
+                condition = false;
+            }
+        } while (condition);
+        return segments;
     }
 }

@@ -79,7 +79,7 @@ public class Hooks extends AbstractTestNGCucumberTests {
     public void afterScenarioFinish(Scenario scenario) throws ConfigurationException, FileNotFoundException {
         String scenarioName = "End of Scenario " + scenario.getName();
         ArrayList<String> ab = new ArrayList<String>();
-
+        DBUtils.closeConnection();
         if (scenarioName.contains(",")) {
             scenario.log(scenarioName.split(",")[0]);
         } else {
