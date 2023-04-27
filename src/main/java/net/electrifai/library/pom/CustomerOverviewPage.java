@@ -1,5 +1,6 @@
 package net.electrifai.library.pom;
 
+import net.electrifai.library.utils.DBUtils;
 import net.electrifai.library.utils.LogManager;
 import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
 import org.openqa.selenium.By;
@@ -32,7 +33,7 @@ public class CustomerOverviewPage extends HomePage {
     @FindBy(xpath = "//div[contains(@class, 'customerItem')]/div/div/div[2]")
     WebElement totalCustomerCount;
     @FindBy(xpath = "//div[contains(@class, 'customerItem')][2]/div[2]/span")
-    WebElement inactiveCustomerPercentage;
+    WebElement activeCustomerPercentage;
     @FindBy(xpath = "//div[contains(@class, 'customerItem')][3]/div/div/div[2]")
     WebElement newlyOnboardedCount;
     @FindBy(xpath = "//div[contains(@class, 'customerItem')][3]/div[2]/span")
@@ -45,8 +46,9 @@ public class CustomerOverviewPage extends HomePage {
         try {
             String customer360heading = "Customers Over 365 Days";
             String customersHeading = Customeroverview365days.getText();
-            LogManager.printInfoLog("Heading: " + customersHeading);
+            //LogManager.printInfoLog("He: " + customersHeading);
             Assert.assertEquals(customersHeading, (customer360heading), "Value does not matches");
+            LogManager.printInfoLog( "Heading " + customersHeading + " Validated Successfully");
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -67,7 +69,7 @@ public class CustomerOverviewPage extends HomePage {
         LogManager.printInfoLog("Title Headings from UI :" + title);
         try{
             Assert.assertEquals(title_List, (title),"The title list does not matches the expected title.");
-            LogManager.printInfoLog( " The title list matches the expected titles");
+            LogManager.printInfoLog( "Customer Overview Heading text Validated Successfully");
         }
 
         catch(Exception e) {
@@ -80,47 +82,54 @@ public class CustomerOverviewPage extends HomePage {
         fileName = "" + fileName + ".xlsx";
         data = ReadAndWriteExcel.readExcelTabRowNew(excelFilePath, fileName, sheetName, dataRowNum);
         List<String> bottom_List = Arrays.asList(data.get("Bottom headings").split("\\|"));
-        LogManager.printInfoLog("The Bottom list from excel is: "+ bottom_List);
+        LogManager.printInfoLog("Customer OverView Widgets Bottom text list from excel is: "+ bottom_List);
         List<String> bottomTitle = new ArrayList<>();
         for (WebElement element : customerData) {
             String text = element.findElement(By.xpath(bottomHeading)).getText();
             bottomTitle.add(text);
         }
-        LogManager.printInfoLog("Bottom Headings from UI :" + bottomTitle);
+        LogManager.printInfoLog("Customer OverView Widgets Bottom text list from UI is : " + bottomTitle);
         try {
-            Assert.assertEquals(bottom_List, (bottomTitle),"The Bottom list does not matches the expected title.");
-            LogManager.printInfoLog( " The Bottom list matches the expected titles");
+            Assert.assertEquals(bottom_List, (bottomTitle),"Customer OverView Bottom Widgets text do not  validated Succesfully ");
+            LogManager.printInfoLog( "Customer OverView Widgets Bottom text Validated Succesfully ");
         }
         catch(Exception e) {
             e.printStackTrace();
-            String logMessage = "The product list doesn't match";
+            String logMessage = "The list doesn't match";
             LogManager.printExceptionLog(e, logMessage);
         }
     }
     public void countCheck() {
+        String[] Customers = {"Total Customer", "Active Customers", "Newly Onboarded Customers"};
+        int i = 0;
         for (WebElement element : customerData) {
             String text = element.findElement(By.xpath(customerCount)).getText();
             int num = Integer.parseInt(text.replaceAll(",", ""));
             if (num > 0) {
-                LogManager.printInfoLog("Greater than 0: " + num);
+
+                String message = "Count for " + Customers[i] + " " + num + " is greater than 0";
+                LogManager.printInfoLog(message);
             }
+            i++;
         }
     }
     public void totalCount() {
         String activeValue = activeCount.getText();
         int num1 = Integer.parseInt(activeValue.replaceAll(",", ""));
+        LogManager.printInfoLog("Active Customer from UI:"+ num1);
         String inactiveValue = inactiveCount.getText();
         int num2 = Integer.parseInt(inactiveValue.replaceAll("[^0-9]+", ""));
+        LogManager.printInfoLog("Inactive Customer from UI:"+ num2);
         int totalCustomersCalculation = num1 + num2;
-        LogManager.printInfoLog("Total Customer Count=" + totalCustomersCalculation);
+        LogManager.printInfoLog("Total Customer from UI=" + totalCustomersCalculation);
         String totalValue = totalCustomerCount.getText();
         int total = Integer.parseInt(totalValue.replaceAll(",", ""));
         try {
-            Assert.assertEquals(total, totalCustomersCalculation, "Total Customer Count does not match with UI.");
-            LogManager.printInfoLog("Total Customer Count matches with UI");
+            Assert.assertEquals(total, totalCustomersCalculation, "Total Customer of Active and Inactive Customers does not match with UI.");
+            LogManager.printInfoLog("Total Customer of Active and Inactive Customers matches with UI : " +total);
         }
         catch (Exception e) {
-            String logMessage = "Value not matches";
+            String logMessage = "Value not matches with UI";
             LogManager.printExceptionLog(e, logMessage);
             Assert.fail(logMessage);
         }
@@ -136,21 +145,21 @@ public class CustomerOverviewPage extends HomePage {
         String percentageForActiveCustomer = String.format("%.1f", Math.round(percentage * 10.0) / 10.0);
         double percentage2 = ((double) num2 / total) * 100;
         String percentagefornewlyonboarded = String.format("%.1f", Math.round(percentage2 * 10.0) / 10.0);
-        String inactivValueUI = inactiveCustomerPercentage.getText();
-        String strPercentagewithoutpercentSign = inactivValueUI.replace("%", "");
+        String activValueUI = activeCustomerPercentage.getText();
+        String strPercentagewithoutpercentSign = activValueUI.replace("%", "");
         String newlyonboardedValue = newlyOnboardedCountPercentage.getText();
-        String strPercentageWithoutPercentSign2 = newlyonboardedValue.replace("%", "");
+        String strPercentagewithoutPercentSign2 = newlyonboardedValue.replace("%", "");
         try {
-            Assert.assertEquals(strPercentagewithoutpercentSign, percentageForActiveCustomer, "Percentage for active customers does not match the UI.");
-            LogManager.printInfoLog("Percentage for Active customers matches with UI");
+            Assert.assertEquals(strPercentagewithoutpercentSign, percentageForActiveCustomer, "Active customers does not match the UI +.");
+            LogManager.printInfoLog("Active customers Percentage " +strPercentagewithoutpercentSign+ " Validated Successful");
         } catch (Exception e) {
             String logMessage = "Percentage for active customers does not match the UI.";
             LogManager.printExceptionLog(e, logMessage);
             Assert.fail(logMessage);
         }
         try {
-            Assert.assertEquals(strPercentageWithoutPercentSign2, percentagefornewlyonboarded, "Percentage for Newly Onboarded Customers does not match with UI");
-            LogManager.printInfoLog("Percentage for Newly Onboarded Customer matches with UI");
+            Assert.assertEquals(strPercentagewithoutPercentSign2, percentagefornewlyonboarded, "Percentage for Newly Onboarded Customers does not match with UI");
+            LogManager.printInfoLog("Newly customers Percentage " +strPercentagewithoutPercentSign2+ " Validated Successful");
         } catch (Exception e) {
             String logMessage = "Percentage for Newly Onboarded Customers does not match with UI";
             LogManager.printExceptionLog(e, logMessage);
