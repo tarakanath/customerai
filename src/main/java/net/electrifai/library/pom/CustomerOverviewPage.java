@@ -22,17 +22,14 @@ import static net.electrifai.library.utils.DriverSetUp.driver;
 public class CustomerOverviewPage extends HomePage {
     String excelFilePath = projectPath + property.getString("testDataPath");
     public static Map<String, String> data = null;
+    ReportLandingPage reportLandingPage;
 
     @FindBy(xpath = "//span[contains(text(),'My Products')]")
     WebElement myProduct_Heading;
     @FindBy(xpath = "//input[@placeholder='Search for products']")
     WebElement searchProduct;
-    @FindBy(xpath = "//div[@class='productItem_container__6vxbd productItem']")
-    List<WebElement> productColumn;
     @FindBy(xpath = "//div[@class='productItem_productName__m8VQb']")
     List<WebElement> product_Name;
-    @FindBy(xpath = "(//div[@class='ant-space-item'])[3]")
-    WebElement propensity_link_cross_sell;
     @FindBy(xpath = "//div[@class='component_title__koRQ4']")
     WebElement cross_sell_text;
 
@@ -59,12 +56,10 @@ public class CustomerOverviewPage extends HomePage {
         LogManager.printInfoLog("The product list from excel is: " + productList);
         getUIProducts();
         try {
-            if (productList.equals(getUIProducts())) {
-                LogManager.printInfoLog("The product list matches and are equal");
-            } else {
-                LogManager.printInfoLog("The product list doesn't matches. please validate");
-            }
-        } catch (Exception e) {
+            Assert.assertEquals(productList, getUIProducts());
+            LogManager.printInfoLog("The product list matches and are equal");
+        }
+        catch (Exception e) {
             e.printStackTrace();
             String logMessage = "The product list doesn't match";
             LogManager.printExceptionLog(e, logMessage);
@@ -84,11 +79,8 @@ public class CustomerOverviewPage extends HomePage {
             actions.sendKeys(searchProduct, productSearch).perform();
             for (WebElement product : product_Name) {
                 String products = product.getText();
-                if (products.contains(productSearch)) {
-                    LogManager.printInfoLog("The Searched product is: " + products);
-                } else {
-                    LogManager.printInfoLog("The searched product value is incorrect.");
-                }
+                Assert.assertTrue(products.contains(productSearch));
+                LogManager.printInfoLog("The Searched product is: " + products);
             }
             searchProduct.clear();
             searchProduct.clear();
@@ -100,28 +92,20 @@ public class CustomerOverviewPage extends HomePage {
         }
     }
 
-    public void reachCustomerLink(String fileName, String sheetName, String dataRowNum) {
+    public void reachCustomerLink(String productName) {
         try {
-            driver.navigate().refresh();
-            fileName = "" + fileName + ".xlsx";
-            data = ReadAndWriteExcel.readExcelTabRowNew(excelFilePath, fileName, sheetName, dataRowNum);
-            String productName = data.get("product name");
+            GenericPageActions.refreshPageViaJavascript();
             WebElement link = driver.findElement(By.xpath("//div[@title='" + productName + "']/ancestor::div[@class='productItem_top__y_f_w']/following-sibling::div[2]"));
             GenericPageActions.scrollToElementView(link);
-            if (link.getText().equals("Reach to potential customers")) {
-                GenericPageActions.scrollToElementView(link);
-                GenericPageActions.click(link, "Reach to potential customer link");
-                Wait.explicitWaitTextVerification(cross_sell_text, "Select below filters to extract the results");
-                GenericPageActions.isElementDisplayed(cross_sell_text, "heading is displayed");
-                Assert.assertEquals(getPageHeading(), "Product Cross-Sell");
-                if (propensity_link_cross_sell.getText().equals(productName)) {
-                    LogManager.printInfoLog("The propensity name is correct and expected:" + productName);
-                }
-            }
-            LogManager.printInfoLog("The link is clicked successfully");
-        } catch (Exception e) {
+            Assert.assertTrue(link.getText().equals("Reach to potential customers"));
+            GenericPageActions.click(link, "Reach to potential customer link");
+            Wait.explicitWaitTextVerification(cross_sell_text, "Select below filters to extract the results");
+            GenericPageActions.isElementDisplayed(cross_sell_text, "heading is displayed");
+            verifyUserLandedOnGivenPage("Product Cross-Sell");
+        }
+            catch (Exception e) {
             e.printStackTrace();
-            String logMessage = "The product name doesn't match";
+            String logMessage = "Reach to potential customer link not correct";
             LogManager.printExceptionLog(e, logMessage);
         }
 

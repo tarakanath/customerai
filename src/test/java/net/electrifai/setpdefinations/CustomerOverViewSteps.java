@@ -3,12 +3,13 @@ package net.electrifai.setpdefinations;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.electrifai.library.pom.CustomerOverviewPage;
+import net.electrifai.library.pom.ReportLandingPage;
 import net.electrifai.library.utils.GenericPageActions;
 import net.electrifai.library.utils.LogManager;
 import net.electrifai.library.utils.ThreadLocalManager;
 import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
-import org.junit.Assert;
 import org.openqa.selenium.WebElement;
+import org.testng.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,53 +21,38 @@ import static net.electrifai.library.pom.HomePage.property;
 
 public class CustomerOverViewSteps {
 
-    CustomerOverviewPage COPage;
+    CustomerOverviewPage coPage;
     String excelFilePath = projectPath + property.getString("testDataPath");
     public static Map<String, String> data = null;
+    ReportLandingPage reportLandingPage;
 
-    public CustomerOverViewSteps(CustomerOverviewPage COPage){
-        this.COPage = COPage;
+    public CustomerOverViewSteps(CustomerOverviewPage coPage, ReportLandingPage reportLandingPage ){
+        this.coPage = coPage;
+        this.reportLandingPage = reportLandingPage;
     }
 
     @Then("validate my products list from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void validateMyProductsListFromTheFileWhereTheSheetIsandDataRowNumIs(String fileName, String sheetName,String dataRowNum) {
-           COPage.getProductName(fileName,sheetName,dataRowNum);
+        coPage.getProductName(fileName,sheetName,dataRowNum);
     }
 
     @Then("Enter product name from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void validateMyProductsSearch(String fileName, String sheetName,String dataRowNum ) {
-            COPage.searchProduct(fileName, sheetName, dataRowNum);
+        coPage.searchProduct(fileName, sheetName, dataRowNum);
     }
 
     @Then("validate potential customers for product from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void validatePotentialCustomersForProduct(String fileName, String sheetName,String dataRowNum ) {
-        COPage.reachCustomerLink(fileName,sheetName,dataRowNum);
+        fileName = "" + fileName + ".xlsx";
+        data = ReadAndWriteExcel.readExcelTabRowNew(excelFilePath, fileName, sheetName, dataRowNum);
+        String productName = data.get("product name");
+        coPage.reachCustomerLink(productName);
+        reportLandingPage.verifyPropensitySelection(productName);
     }
 
     @Then("validate data for the product widget")
     public void validateDataForProductWidget(){
-        COPage.getDataCountFromProductWidget();
-    }
-
-
-    @Then("validate navigation to {string} page from my products")
-    public void validateNavigationToPageFromMyProducts(String string) {
-        // verify navigation to cross-sell page when clicked on  "Reach potential customer"
-        // verify respective propensity selected by default according to products selection.
-        throw new io.cucumber.java.PendingException();
-    }
-
-    @Then("Validate three category customer tiles from the file {string} where the sheet is {string}")
-    public void validateThreeCategoryCustomerTilesFromTheFileWhereTheSheetIs(String string, String string2) {
-        // validate Total, active, newly boarding customers tiles.
-        // validate each tile title
-        throw new io.cucumber.java.PendingException();
-    }
-
-    @Then("validate three category customers data.")
-    public void validateThreeCategoryCustomersData() {
-        // validate data from all three customer tiles.
-        throw new io.cucumber.java.PendingException();
+        coPage.getDataCountFromProductWidget();
     }
 
 }
