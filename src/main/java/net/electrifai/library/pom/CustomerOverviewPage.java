@@ -141,7 +141,7 @@ public class CustomerOverviewPage extends HomePage {
                 LogManager.printInfoLog("The percentage value for: " + products + " is " + perValue);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                String logMessage = "The number is not an integer.";
+                String logMessage = "The number is not an integer..";
                 LogManager.printExceptionLog(e, logMessage);
             }
 
