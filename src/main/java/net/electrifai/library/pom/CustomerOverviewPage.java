@@ -26,7 +26,6 @@ public class CustomerOverviewPage extends HomePage {
     String titleHeading = "div[1]/div[1]/div[1]";
     String bottomHeading = "div[3]";
     String customerCount = "div/div/div[2]";
-
     @FindBy(xpath = "//div[contains(@class, 'customerItem')][2]/div/div/div[2]")
     WebElement activeCount;
     @FindBy(xpath = "//div[contains(@class, 'customerItem')][2]/div[3]")
@@ -157,6 +156,7 @@ public class CustomerOverviewPage extends HomePage {
             LogManager.printExceptionLog(e, logMessage);
             Assert.fail(logMessage);
         }
+        LogManager.printInfoLog("DB Validation Successfull");
     }
     public void totalCount() {
         String activeValue = activeCount.getText();

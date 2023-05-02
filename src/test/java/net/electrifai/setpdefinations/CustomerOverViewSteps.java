@@ -21,26 +21,6 @@ public class CustomerOverViewSteps {
         this.coPage = COPage;
     }
 
-    @Then("validate my products list from the file {string} where the sheet is {string}")
-    public void validateMyProductsListFromTheFileWhereTheSheetIs(String string, String string2) {
-
-        //verify available products list.
-        throw new io.cucumber.java.PendingException();
-    }
-
-    @Then("validate my products search")
-    public void validateMyProductsSearch() {
-
-        // validate products search with exact and regular expression.
-        //Product list filtered out according to search criteria.
-        throw new io.cucumber.java.PendingException();
-    }
-    @Then("validate navigation to {string} page from my products")
-    public void validateNavigationToPageFromMyProducts(String string) {
-        // verify navigation to cross-sell page when clicked on  "Reach potential customer"
-        // verify respective propensity selected by default according to products selection.
-        throw new io.cucumber.java.PendingException();
-    }
     @Then("Validate three top category customer tiles from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void validateThreeTopCategoryCustomerTilesFromTheFileWhereTheSheetIs( String fileName, String sheetName, String dataRowNum) {
         coPage.customerTitleHeading(fileName, sheetName, dataRowNum);
@@ -58,8 +38,8 @@ public class CustomerOverViewSteps {
     public void validateActiveAndNewlyOnboardedCustomersPercentageFromUI() {
             coPage.percentageCount();
         }
-    @Then("Validate customer stats from Customer Overview Page are positive")
-    public void validateCustomerStatsFromCustomerOverviewPageArePositive() {
+    @Then("Validate customer stats from Customer Overview Page are positive and match the count from DB")
+    public void validateCustomerStatsFromCustomerOverviewPageArePositiveAndMatchTheCountFromDB()  {
         coPage.countCheck();
     }
-    }
+}
