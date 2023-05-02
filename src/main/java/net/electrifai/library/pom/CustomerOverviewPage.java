@@ -149,11 +149,11 @@ public class CustomerOverviewPage extends HomePage {
         try
         {
         assertEquals(dbNewlyOnboardedCustomerCount, newlyOnboardedCustomerCount, "New customer count does not match.");
-        LogManager.printInfoLog("Newly Onboarded customer count matches with DB " + dbNewlyOnboardedCustomerCount);
+        LogManager.printInfoLog("Newly Onboarded Customer count matches with DB " + dbNewlyOnboardedCustomerCount);
         }
         catch (Exception e)
         {
-            String logMessage = "Newly Onboarded Customers doesnot matches";
+            String logMessage = "Newly Onboarded Customers does not matches";
             LogManager.printExceptionLog(e, logMessage);
             Assert.fail(logMessage);
         }
@@ -204,7 +204,7 @@ public class CustomerOverviewPage extends HomePage {
         }
         try {
             assertEquals(strPercentageWithoutPercentSign2, percentageForNewlyOnboarded, "Percentage for Newly Onboarded Customers does not match with UI "+percentageForNewlyOnboarded);
-            LogManager.printInfoLog("Newly customers Percentage " +strPercentageWithoutPercentSign2+ " Validated Successful");
+            LogManager.printInfoLog("Newly Customers Percentage " +strPercentageWithoutPercentSign2+ " Validated Successful");
         } catch (Exception e) {
             String logMessage = "Percentage for Newly Onboarded Customers " +strPercentageWithoutPercentSign2+ " does not match with UI";
             LogManager.printExceptionLog(e, logMessage);
