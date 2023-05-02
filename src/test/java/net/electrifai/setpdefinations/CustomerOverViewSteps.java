@@ -14,11 +14,11 @@ import static net.electrifai.library.pom.HomePage.property;
 
 public class CustomerOverViewSteps {
 
-    CustomerOverviewPage COPage;
+    CustomerOverviewPage coPage;
     String excelFilePath = projectPath + property.getString("testDataPath");
     public static Map<String, String> data = null;
     public CustomerOverViewSteps(CustomerOverviewPage COPage){
-        this.COPage = COPage;
+        this.coPage = COPage;
     }
 
     @Then("validate my products list from the file {string} where the sheet is {string}")
@@ -43,23 +43,23 @@ public class CustomerOverViewSteps {
     }
     @Then("Validate three top category customer tiles from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void validateThreeTopCategoryCustomerTilesFromTheFileWhereTheSheetIs( String fileName, String sheetName, String dataRowNum) {
-        COPage.customerTitleHeading(fileName, sheetName, dataRowNum);
+        coPage.customerTitleHeading(fileName, sheetName, dataRowNum);
     }
     @Then("Validate three bottom category customer tiles from the file {string} where the sheet is {string} and DataRowNum is {string}")
     public void validateThreeBottomCategoryCustomerTilesFromTheFileWhereTheSheetIsAndDataRowNumIs( String fileName, String sheetName, String dataRowNum) {
-        COPage.getTopTitle();
-        COPage.customerBottomHeading(fileName,sheetName,dataRowNum);
+        coPage.getTopTitle();
+        coPage.customerBottomHeading(fileName,sheetName,dataRowNum);
     }
     @Then("Validate total count of Active and Inactive customers")
     public void validateTotalCountOfActiveAndInactiveCustomers() {
-        COPage.totalCount();
+        coPage.totalCount();
     }
     @Then("Validate Active and Newly Onboarded Customers Percentage from UI")
     public void validateActiveAndNewlyOnboardedCustomersPercentageFromUI() {
-            COPage.percentageCount();
+            coPage.percentageCount();
         }
     @Then("Validate customer stats from Customer Overview Page are positive")
     public void validateCustomerStatsFromCustomerOverviewPageArePositive() {
-        COPage.countCheck();
+        coPage.countCheck();
     }
     }

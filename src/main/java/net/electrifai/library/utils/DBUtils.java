@@ -33,6 +33,7 @@ public class DBUtils {
             ResultSet resultSet = stmt.executeQuery(queryStatement);
             while (resultSet.next()) {
                 SQLDataset.add(resultSet.getString(columnName));
+
             }
         } catch (Exception e) {
             e.printStackTrace();
