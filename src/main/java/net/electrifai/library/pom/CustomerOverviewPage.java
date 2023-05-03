@@ -123,39 +123,13 @@ public class CustomerOverviewPage extends HomePage {
         int activeCustomerCount = counts.get(1);
         int newlyOnboardedCustomerCount = counts.get(2);
         LogManager.printInfoLog("Comparing Customer Counts from DB and UI");
-        try
-        {
+
         assertEquals(dbTotalCustomerCount, totalCustomerCount, "Total customer count does not match.");
         LogManager.printInfoLog("Total customer count matches with DB " + dbTotalCustomerCount);
-         }
-       catch (Exception e)
-       {
-        String logMessage = "Total Customer Count does not matches ";
-        LogManager.printExceptionLog(e, logMessage);
-        Assert.fail(logMessage);
-       }
-        try
-       {
         assertEquals(dbActiveCustomerCount, activeCustomerCount, "Active customer count does not match.");
         LogManager.printInfoLog("Active customer count matches with DB " + dbActiveCustomerCount);
-       }
-        catch (Exception e)
-        {
-            String logMessage = "Active Customer Count does not matches ";
-            LogManager.printExceptionLog(e, logMessage);
-            Assert.fail(logMessage);
-        }
-        try
-        {
         assertEquals(dbNewlyOnboardedCustomerCount, newlyOnboardedCustomerCount, "New customer count does not match.");
         LogManager.printInfoLog("Newly Onboarded Customer count matches with DB " + dbNewlyOnboardedCustomerCount);
-        }
-        catch (Exception e)
-        {
-            String logMessage = "Newly Onboarded Customers does not matches";
-            LogManager.printExceptionLog(e, logMessage);
-            Assert.fail(logMessage);
-        }
         LogManager.printInfoLog("DB Validation Successfull");
     }
     public void totalCount() {
@@ -169,15 +143,8 @@ public class CustomerOverviewPage extends HomePage {
         LogManager.printInfoLog("Total Customer from UI=" + totalCustomersCalculation);
         String totalValue = totalCustomerCount.getText();
         int total = Integer.parseInt(totalValue.replaceAll(",", ""));
-        try {
             assertEquals(total, totalCustomersCalculation, "Total Customer of Active and Inactive Customers does not match with UI." + totalCustomersCalculation);
             LogManager.printInfoLog("Total Customer of Active and Inactive Customers matches with UI : " +total);
-        }
-        catch (Exception e) {
-            String logMessage = "Total Customer of Active and Inactive Customers does not match with UI.";
-            LogManager.printExceptionLog(e, logMessage);
-            Assert.fail(logMessage);
-        }
     }
     public void percentageCount() {
         String activeValue = activeCount.getText();
