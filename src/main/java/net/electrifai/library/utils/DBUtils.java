@@ -23,9 +23,7 @@ public class DBUtils {
             String log = " DB Connection failed";
             LogManager.printExceptionLog(e, log);
         }
-
     }
-
     public static List<String> getGivenColumnValueFromStatement(String queryStatement, String columnName) {
         List<String> SQLDataset = new ArrayList<String>();
         try {
@@ -33,7 +31,6 @@ public class DBUtils {
             ResultSet resultSet = stmt.executeQuery(queryStatement);
             while (resultSet.next()) {
                 SQLDataset.add(resultSet.getString(columnName));
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +38,6 @@ public class DBUtils {
         DBUtils.closeConnection();
         return SQLDataset;
     }
-
     public static List<Map<String, String>> getDataFromStatement(String queryStatement) {
         List<Map<String, String>> data = new ArrayList<>();
         try {
@@ -63,7 +59,6 @@ public class DBUtils {
         DBUtils.closeConnection();
         return data;
     }
-
     public static void closeConnection() {
         try {
             if (stmt != null) {
@@ -74,6 +69,5 @@ public class DBUtils {
             String log = "Connection closed failed";
             LogManager.printExceptionLog(e, log);
         }
-
     }
 }
