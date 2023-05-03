@@ -123,7 +123,6 @@ public class CustomerOverviewPage extends HomePage {
         int activeCustomerCount = counts.get(1);
         int newlyOnboardedCustomerCount = counts.get(2);
         LogManager.printInfoLog("Comparing Customer Counts from DB and UI");
-
         assertEquals(dbTotalCustomerCount, totalCustomerCount, "Total customer count does not match.");
         LogManager.printInfoLog("Total customer count matches with DB " + dbTotalCustomerCount);
         assertEquals(dbActiveCustomerCount, activeCustomerCount, "Active customer count does not match.");
