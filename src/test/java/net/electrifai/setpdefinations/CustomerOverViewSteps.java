@@ -75,5 +75,6 @@ public class CustomerOverViewSteps {
     @Then("validate percentage count for the product widget")
     public void validatePercentageCountForTheProductWidget(){
         coPage.validatePercentageCount();
+
     }
 }
