@@ -7,10 +7,13 @@ Feature: Customer Overview page validation.
 
   Scenario: Verify my products on customer overview page.
      And Navigate to "Customer Overview" page
-     Then validate my products list from the file "customerOverview" where the sheet is "my_products" and DataRowNum is "1"
+     Then validate my product list from Database
      Then Enter product name from the file "customerOverview" where the sheet is "my_products" and DataRowNum is "2"
      Then validate potential customers for product from the file "customerOverview" where the sheet is "my_products" and DataRowNum is "3"
-     Then validate data for the product widget
+     Then validate active customer count from Database for the product widget
+     Then validate inactive customer count for the product widget
+     Then validate percentage count for the product widget
+
 #
 #  Scenario: Verify customer data.
 #    And Navigate to "Customer Overview" page

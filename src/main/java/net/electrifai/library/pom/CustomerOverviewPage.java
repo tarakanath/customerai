@@ -1,21 +1,21 @@
 package net.electrifai.library.pom;
 
-import lombok.extern.java.Log;
+import io.cucumber.java.sl.In;
+import net.electrifai.library.utils.DBUtils;
 import net.electrifai.library.utils.GenericPageActions;
 import net.electrifai.library.utils.LogManager;
 import net.electrifai.library.utils.Wait;
 import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
-import org.apache.xpath.objects.XString;
+import org.apache.xmlbeans.impl.values.XmlIntegerRestriction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.net.ConnectException;
+import java.text.DecimalFormat;
+import java.util.*;
 
 import static net.electrifai.library.utils.DriverSetUp.driver;
 
@@ -49,17 +49,21 @@ public class CustomerOverviewPage extends HomePage {
         return UIList;
     }
 
+    public void getAndCompareProductName() {
+        List<String> dbProducts = DBUtils.getGivenColumnValueFromStatement("SELECT product_name FROM customerengagementqa.products;", "product_name");
+        LogManager.printInfoLog("The product list from DB is: " + dbProducts);
+        GenericPageActions.compareGivenLists(getUIProducts(), "uiProductList", dbProducts, "dbProductList");
+    }
+
     public void getProductName(String fileName, String sheetName, String dataRowNum) {
         fileName = "" + fileName + ".xlsx";
         data = ReadAndWriteExcel.readExcelTabRowNew(excelFilePath, fileName, sheetName, dataRowNum);
         List<String> productList = Arrays.asList(data.get("product name").split("\\|"));
-        LogManager.printInfoLog("The product list from excel is: " + productList);
         getUIProducts();
         try {
             Assert.assertEquals(productList, getUIProducts());
             LogManager.printInfoLog("The product list matches and are equal");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             String logMessage = "The product list doesn't match";
             LogManager.printExceptionLog(e, logMessage);
@@ -102,8 +106,7 @@ public class CustomerOverviewPage extends HomePage {
             Wait.explicitWaitTextVerification(cross_sell_text, "Select below filters to extract the results");
             GenericPageActions.isElementDisplayed(cross_sell_text, "heading is displayed");
             verifyUserLandedOnGivenPage("Product Cross-Sell");
-        }
-            catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             String logMessage = "Reach to potential customer link not correct";
             LogManager.printExceptionLog(e, logMessage);
@@ -147,7 +150,160 @@ public class CustomerOverviewPage extends HomePage {
 
         }
     }
+
+    public Map<String, String> fetchActiveCustomerFromUI() {
+        Map<String, String> activeCustomerKeyPairValue = null;
+        activeCustomerKeyPairValue = new HashMap<>();
+        try {
+            for (WebElement product : product_Name) {
+                String products = product.getText();
+                WebElement activeCountElement = driver.findElement(By.xpath("//div[@title='" + products + "']/ancestor::div[@class='productItem_top__y_f_w']/following-sibling::div/div[1]/div[1]"));
+                activeCustomerKeyPairValue.put(products, activeCountElement.getText());
+            }
+            LogManager.printInfoLog("The active customer count from UI is: " + activeCustomerKeyPairValue);
+        }
+        catch (NoSuchElementException e) {
+            e.printStackTrace();
+            String logMessage = "Element is not found.";
+            LogManager.printExceptionLog(e, logMessage);
+        }
+        return activeCustomerKeyPairValue;
+    }
+
+    public Map<String, String> fetchActiveCustomerCountFromDB() {
+        List<Map<String, String>> activeCustomerFromDB = DBUtils.getDataFromStatement("select prod.product_name,cust_prod.active_customer_count from customerengagementqa.products prod inner join \n" +
+                "customer_products_aggregated cust_prod on(prod.product_id=cust_prod.product_id);");
+        Map<String, String> countFromDB = new HashMap();
+        try {
+            for (Map<String, String> temp : activeCustomerFromDB) {
+                countFromDB.put(temp.get("product_name"), temp.get("active_customer_count"));
+            }
+            LogManager.printInfoLog("The active customer count from DB is: " + countFromDB);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            String logMessage = "Active Customer Data not fetched from DB ";
+            LogManager.printExceptionLog(e, logMessage);
+        }
+        return countFromDB;
+    }
+
+    public void validateActiveCustomerCountForProduct() {
+        Map<String, String> activeCountUI = fetchActiveCustomerFromUI();
+        Map<String, String> activeCountDB = fetchActiveCustomerCountFromDB();
+        for (WebElement product : product_Name) {
+            String products = product.getText();
+            try {
+                Assert.assertEquals(activeCountUI.get(products), activeCountDB.get(products), "The active customer validation failed for: " + products);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                String logMessage = "Active Customer Data doesn't not match ";
+                LogManager.printExceptionLog(e, logMessage);
+            }
+        }
+
+        LogManager.printInfoLog("The Active customer count validation successful.");
+    }
+
+    public Map<String, String> fetchLastYearCustomerCountFromDB() {
+        List<Map<String, String>> lastYearCustomerCountFromDB = DBUtils.getDataFromStatement("select prod.product_name,\n" +
+                "cust_prod.customer_count_last_year from customerengagementqa.products prod inner join \n" +
+                "customer_products_aggregated cust_prod on(prod.product_id=cust_prod.product_id);");
+        Map<String, String> lastYearCountFromDB = new HashMap();
+        try {
+            for (Map<String, String> temp : lastYearCustomerCountFromDB) {
+                lastYearCountFromDB.put(temp.get("product_name"), temp.get("customer_count_last_year"));
+            }
+            LogManager.printInfoLog("The last year customer count from DB is: " + lastYearCountFromDB);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            String logMessage = "Last Year Customer Data not fetched from DB ";
+            LogManager.printExceptionLog(e, logMessage);
+        }
+        return lastYearCountFromDB;
+    }
+
+
+    public Map<String, String> fetchInactiveCustomerFromUI() {
+        Map<String, String> inactiveCustomerKeyPairValue = null;
+        inactiveCustomerKeyPairValue = new HashMap<>();
+        try {
+            for (WebElement product : product_Name) {
+                String products = product.getText();
+                WebElement inactiveCountElement = driver.findElement(By.xpath("//div[@title='" + products + "']/ancestor::div[@class='productItem_top__y_f_w']/following-sibling::div/div[2]/div[1]"));
+                inactiveCustomerKeyPairValue.put(products, inactiveCountElement.getText());
+            }
+        }
+        catch (NoSuchElementException e) {
+            e.printStackTrace();
+            String logMessage = "Inactive Customer Data not fetched from UI ";
+            LogManager.printExceptionLog(e, logMessage);
+        }
+        LogManager.printInfoLog("The inactive customer count from UI is: " + inactiveCustomerKeyPairValue);
+        return inactiveCustomerKeyPairValue;
+    }
+
+    public void validateInactiveCustomerCount() {
+        Map<String, String> lastYearCount = fetchLastYearCustomerCountFromDB();
+        Map<String, String> activeCountDB = fetchActiveCustomerCountFromDB();
+        Map<String, String> inactiveCountDB = fetchInactiveCustomerFromUI();
+        for (WebElement product : product_Name) {
+            String products = product.getText();
+            Integer inactiveCustomerCountDB = Integer.parseInt(activeCountDB.get(products).replaceAll(",", "")) - Integer.parseInt(lastYearCount.get(products).replaceAll(",", ""));
+            LogManager.printInfoLog("the Difference from DB value is: " + inactiveCustomerCountDB);
+            Integer inactiveCustomerCountUI = Integer.parseInt(inactiveCountDB.get(products).replaceAll(",", ""));
+            LogManager.printInfoLog("the inactive value from UI is: " + inactiveCustomerCountDB);
+            try{
+            Assert.assertEquals(inactiveCustomerCountDB, inactiveCustomerCountUI, "The Inactive count failed for: " + products);
+            }
+            catch (NumberFormatException e) {
+                e.printStackTrace();
+                String logMessage = "Active Customer Data not fetched from DB ";
+                LogManager.printExceptionLog(e, logMessage);
+            }
+        }
+
+        LogManager.printInfoLog("The Inactive customer count validation successful.");
+
+    }
+
+
+    public void validatePercentageCount() {
+        Map<String, String> lastYearCountDB = fetchLastYearCustomerCountFromDB();
+        Map<String, String> inactiveCountUI = fetchInactiveCustomerFromUI();
+        for (WebElement product : product_Name) {
+            String products = product.getText();
+            double inactiveCount = Double.parseDouble(inactiveCountUI.get(products).replaceAll(",", ""));
+            double lastYearCount = Double.parseDouble(lastYearCountDB.get(products).replaceAll(",", ""));
+            double percentageCalculated = (inactiveCount / lastYearCount) * 100;
+            DecimalFormat df = new DecimalFormat("#.#");
+            double formattedPercentage = Double.parseDouble(df.format(percentageCalculated));
+            LogManager.printInfoLog("The percentage Calculated is: " + formattedPercentage);
+            //get percentage Values from UI
+            String percentageStringFromUI = driver.findElement(By.xpath("//div[@title='" + products + "']/ancestor::div[@class='productItem_top__y_f_w']/div[2]/div[2]/span[1]")).getText();
+            // String percentageChange = percentageStringFromUI.getText();
+            String splitPercentageValue = percentageStringFromUI.split("\\%")[0];
+            double percentageUI = Double.parseDouble(splitPercentageValue);
+            LogManager.printInfoLog("The percentage change from UI is: " + percentageUI);
+            try {
+                Assert.assertEquals(formattedPercentage, percentageUI, "The percentage change is incorrect for: " + products);
+            }
+            catch (NumberFormatException e) {
+                e.printStackTrace();
+                String logMessage = "Active Customer Data not fetched from DB ";
+                LogManager.printExceptionLog(e, logMessage);
+            }
+        }
+        LogManager.printInfoLog("The percentage change for customer count validation successful.");
+    }
+
 }
+
+
+
+
 
 
 
