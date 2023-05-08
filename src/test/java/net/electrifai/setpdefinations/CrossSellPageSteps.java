@@ -95,7 +95,8 @@ public class CrossSellPageSteps {
         data = ReadAndWriteExcel.readExcelTabRowNew(excelFilePath, fileName, sheetName, dataRowNum);
         reportPage.verifyCustomerProbabilitySelection(pageName, data);
         ArrayList<String> expectedDrivers = new ArrayList<>(Arrays.asList(data.get("Selected Drivers").split(",")));
-        reportPage.verifyDriverSelection(expectedDrivers);
+        reportPage.verifyDriverSelection();
+        reportPage.verfiyDriversWithDB();
     }
 
     @Then("Verify selection from the file {string} where the sheet is {string} and DataRowNum is {string}")
@@ -107,12 +108,6 @@ public class CrossSellPageSteps {
         reportPage.verifyCustomerProbabilitySelection(pageName, data);
     }
 
-    @Then("verify driver selection")
-    public void verifyDriverSelection() {
-        Random ran = new Random();
-        int x = ran.nextInt(5);
-
-    }
 
     @Then("update and verify customer probability selection data from file {string} Where the sheet is {string} from data row {int} to {int}")
     public void updateAndVerifyCustomerProbabilitySelectionDataFromFileWhereTheSheetIsFromDataRowTo(String fileName, String sheetName, int fromDataRow, int toDataRow) {
@@ -130,18 +125,18 @@ public class CrossSellPageSteps {
 
     @Then("update and verify driver selection in customer profile table")
     public void updateAndVerifyDriverSelection() {
-        List<String> driversList = new ArrayList<>(Arrays.asList("Driver 1", "Driver 2", "Driver 3", "Driver 4", "Driver 5"));
+        List<String> driversList = new ArrayList<>(reportPage.getDriversListFromDB());
         Random ran = new Random();
-        int x = ran.nextInt(5);
+        int x = ran.nextInt(driversList.size()-1);
         driversList.remove(x);
         // test to select four drivers out of five.
         reportPage.selectDrivers(driversList);
-        reportPage.verifyDriverSelection(driversList);
+        reportPage.verifyDriverSelection();
         // test to select three drivers out of five.
-        x = ran.nextInt(4);
+        x = ran.nextInt(driversList.size()-2);
         driversList.remove(x);
         reportPage.selectDrivers(driversList);
-        reportPage.verifyDriverSelection(driversList);
+        reportPage.verifyDriverSelection();
 
     }
 
@@ -190,6 +185,7 @@ public class CrossSellPageSteps {
         }
         reportPage.verifySelectedFilterCtriteria(data);
         reportPage.verifySelectedFilterCtriteriaInProfileTable(data);
+        reportPage.verifyDriverSelection();
     }
 
     @Then("verify customer profile info page when profile window {string}")
@@ -203,18 +199,17 @@ public class CrossSellPageSteps {
 
     @Then("verify drivers filter in customer profile table.")
     public void verifyDriversFilterInCustomerProfileTable() {
-        List<String> driversList = new ArrayList<>(Arrays.asList("Driver 1", "Driver 2", "Driver 3", "Driver 4", "Driver 5"));
+        List<String> driversList = new ArrayList<>(reportPage.getDriversListFromDB());
         Random ran = new Random();
         List<String> selectedDriver=new ArrayList<>();
-        int i=ran.nextInt(5);
+        int i=ran.nextInt(driversList.size()-1);
         selectedDriver.add(driversList.get(i));
-        reportPage.doGivenActionOnProfile("expand");
-        reportPage.setupFilterForSelectedDrivers(selectedDriver);
-        reportPage.doGivenActionOnProfile("minimize");
+        reportPage.setupFilterForSelectedDrivers();
         //to clear driver filter.
-        reportPage.selectDrivers(selectedDriver);
-        reportPage.selectDrivers(driversList);
+       // reportPage.selectDrivers(selectedDriver);
+       // reportPage.selectDrivers(driversList);
 
     }
+
 
 }
