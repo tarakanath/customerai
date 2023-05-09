@@ -58,8 +58,6 @@ public class CustomerOverviewPage extends HomePage {
     List<WebElement> product_Name;
     @FindBy(xpath = "//div[@class='component_title__koRQ4']")
     WebElement cross_sell_text;
-    String excelFilePath = projectPath + property.getString("testDataPath");
-    public static Map<String, String> data = null;
     ReportLandingPage reportLandingPage;
 
     public void getTopTitle() {
@@ -170,7 +168,6 @@ public class CustomerOverviewPage extends HomePage {
         LogManager.printInfoLog("Newly Customers Percentage " + strPercentageWithoutPercentSign2 + " Validated Successful");
     }
 
-}
 
 
 
