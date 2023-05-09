@@ -293,7 +293,14 @@ public class SegmentationPage extends HomePage {
     public void doGivenActionOnGivenSegment(String action, Map<String, String> data) {
         navigateToSelectedPage("Segmentation");
         WebElement element = getGivenSegmentWebElement(data.get("segmentName"));
-        WebElement deleteButton = element.findElement(By.cssSelector(segmentationDeleteButton));
+        WebElement deleteButton = null;
+        if (!(element == null)) {
+            deleteButton = element.findElement(By.cssSelector(segmentationDeleteButton));
+        } else {
+            String log = "Segmentation is not found";
+            LogManager.printFailLog("Segmentation is not found");
+            Assert.fail(log);
+        }
         WebElement editButton = element.findElement(By.cssSelector(segmentationEditButton));
         switch (action) {
             case "delete":
