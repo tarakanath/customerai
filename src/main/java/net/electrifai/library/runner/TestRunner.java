@@ -13,5 +13,4 @@ import io.cucumber.testng.CucumberOptions;
         tags = "@smoke"
 )
 public class TestRunner extends BaseClass {
-
 }

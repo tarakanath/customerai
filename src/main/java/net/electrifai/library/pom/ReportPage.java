@@ -1,10 +1,7 @@
 package net.electrifai.library.pom;
 
 
-import net.electrifai.library.utils.GenericPageActions;
-import net.electrifai.library.utils.LogManager;
-import net.electrifai.library.utils.ThreadLocalManager;
-import net.electrifai.library.utils.Wait;
+import net.electrifai.library.utils.*;
 import org.apache.commons.collections.functors.WhileClosure;
 import org.apache.commons.lang.time.StopWatch;
 import org.openqa.selenium.By;
@@ -293,7 +290,6 @@ public class ReportPage extends ReportLandingPage {
 
 
     public void selectDrivers(List<String> options) {
-
         try {
             for (WebElement element : driverNames) {
                 // verify driver to un select when it is already checked
@@ -327,9 +323,9 @@ public class ReportPage extends ReportLandingPage {
 
     }
 
-    public void verifyDriverSelection(List<String> driversList) {
+    public void verifyDriverSelection() {
+
         List<String> selectedDrivers = new ArrayList<>(getTextForGivenWebElements(selectedDriverCheckBoxList, "selected drivers"));
-        GenericPageActions.compareGivenLists(selectedDrivers, "Selected drivers", driversList, "Expected drivers");
         doGivenActionOnProfile("expand");
         List<String> prfileTableColumnNames = getTextForGivenWebElements(profileTableHeadingList, "customer profile column headings");
         prfileTableColumnNames.removeAll(List.of("Customer Name", "Customer Id"));
@@ -338,6 +334,13 @@ public class ReportPage extends ReportLandingPage {
         GenericPageActions.takeScreenShot(prfileTableColumnNames.toString());
         doGivenActionOnProfile("minimize");
 
+    }
+
+    public void verfiyDriversWithDB() {
+        List<String> dbDriversList = new ArrayList<>(getDriversListFromDB());
+        List<String> selectedDrivers = new ArrayList<>(getTextForGivenWebElements(selectedDriverCheckBoxList, "UI Driver List"));
+        GenericPageActions.compareGivenLists(selectedDrivers, "UI Driver List", dbDriversList, "Expected drivers");
+        LogManager.printInfoLog("Drivers DB validation completed sucessfully");
 
     }
 
@@ -521,7 +524,13 @@ public class ReportPage extends ReportLandingPage {
 
     private List<String> getavaliablePageSizeOptions() {
         try {
-            GenericPageActions.click(pageSizeDropDown, "Page size drop down");
+            if (pageSizeDropDown.isDisplayed()) {
+                GenericPageActions.click(pageSizeDropDown, "Page size drop down");
+            } else {
+                String log = "Page drop down not avaliable on UI";
+                LogManager.printFailLog(log);
+                Assert.fail(logMessage);
+            }
             GenericPageActions.isElementDisplayed(pageSizeDropDownOptions.get(0), "page size dropdown");
             pageSizeDropDownOptions.stream().forEach(e -> e.isDisplayed());
             List<String> temp = new ArrayList<>();
@@ -732,41 +741,83 @@ public class ReportPage extends ReportLandingPage {
         return null;
     }
 
-    public void setupFilterForSelectedDrivers(List<String> selectedDriver) {
+    public void setupFilterForSelectedDrivers() {
+        Random ran = new Random();
+        List<String> selectedDriver = getTextForGivenWebElements(selectedDriverCheckBoxList, "Drivers from UI");
+        List<String> selectedDriverForFilter = new ArrayList<>();
+        selectedDriverForFilter.add(selectedDriver.get(ran.nextInt(5)));
+        doGivenActionOnProfile("expand");
         List<TreeMap<String, String>> tableData = getprofileTableData(true);
         int selectedStar = 0;
-        for (String driver : selectedDriver) {
+        for (String driver : selectedDriverForFilter) {
             for (WebElement element : profileTableHeadingList) {
                 GenericPageActions.scrollToElementView(element);
                 if (element.getText().trim().equals(driver)) {
-                    GenericPageActions.click(element.findElement(By.xpath(driverFilterButton)), driver + " filter button");
+                    GenericPageActions.click(element.findElement(By.xpath(driverFilterButton)), "Driver: " + driver + " filter button");
                     GenericPageActions.actionClick(driverFilterDropDown, "driver filter dropdown");
-                    System.out.println("star " + driver + " " + tableData.get(0).get(driver));
                     selectedStar = Integer.parseInt(tableData.get(0).get(driver));
-                    System.out.println("stars options " + driverFilterDropDownElements.size());
                     GenericPageActions.click(driverFilterDropDownElements.get(5 - selectedStar), selectedStar + " star");
-                    GenericPageActions.takeScreenShot(selectedDriver.toString());
+                    Wait.explicitWait(profilePages.get(0), "visibility");
+                    GenericPageActions.scrollToElementView(element);
+                    GenericPageActions.click(element.findElement(By.xpath(driverFilterButton)), "Driver: " + driver + " filter button");
+                    GenericPageActions.takeScreenShot(selectedDriverForFilter.toString());
                     break;
                 }
             }
         }
-        validateTableDataForDriverFilter(selectedStar, selectedDriver);
+        validateTableDataForDriverFilter(selectedStar, selectedDriverForFilter);
+        doGivenActionOnProfile("minimize");
+
     }
 
     private void validateTableDataForDriverFilter(int selectedStar, List<String> driverList) {
-        GenericPageActions.takeScreenShot(driverList.get(0) + " set filter " + selectedStar + "star");
+
         List<TreeMap<String, String>> tableData = getprofileTableData(true);
         for (String driver : driverList) {
             for (Map<String, String> row : tableData) {
                 Assert.assertEquals(row.get(driver), String.valueOf(selectedStar), driver + " data not filted as expected");
             }
         }
-
+        GenericPageActions.takeScreenShot(driverList.get(0) + " set filter " + selectedStar + "star");
         LogManager.printInfoLog(driverList + " filter validation sucessfull");
     }
 
     public void verifyLandedOnReportPage(String pageName) {
         Wait.explicitWait(reportTitle, "visibility");
         GenericPageActions.isElementDisplayedWithExpectedText(reportTitle, "Report Title ", pageName);
+    }
+
+    public List<String> getDriversListFromDB() {
+        String modelUseCaseId = getModelUseCaseId(getPageHeading());
+        List<String> selectedFilterCriteria = getTextForGivenWebElements(filterCriteria, "Selected filter");
+        String productName = selectedFilterCriteria.get(1);
+        String queryString = "select driver_1_display_name,driver_2_display_name,driver_3_display_name,driver_4_display_name,driver_5_display_name,driver_6_display_name,driver_7_display_name,driver_8_display_name,driver_9_display_name,driver_10_display_name from customerengagementqa.products prod inner join customerengagementqa.product_model_mapping modelmap on (prod.product_id=modelmap.product_id)\n" +
+                " inner join models m on (modelmap.model_id=m.model_id) where prod.product_name=? and modelmap.usecase_id=?;";
+        Map<Integer, String> queryParams = new HashMap<>();
+        queryParams.put(1, productName);
+        queryParams.put(2, modelUseCaseId);
+        List<String> driverList = DBUtils.getRowDataAsList(queryString, queryParams);
+        return driverList;
+    }
+
+    private String getModelUseCaseId(String pageHeading) {
+        switch (pageHeading) {
+            case "Product Up-Sell":
+                pageHeading = "upsell";
+                break;
+
+            case "Product Cross-Sell":
+                pageHeading = "cross_sell";
+                break;
+
+            case "Customer Churn":
+                pageHeading = "churn";
+                break;
+
+            case "Customer Acquisition":
+                pageHeading = "customer_acquisition";
+                break;
+        }
+        return pageHeading;
     }
 }

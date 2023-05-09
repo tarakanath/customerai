@@ -1,10 +1,9 @@
 package net.electrifai.library.utils;
 
+import org.testng.Assert;
+
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DBUtils {
     private static Connection con;
@@ -22,8 +21,8 @@ public class DBUtils {
         } catch (Exception e) {
             String log = " DB Connection failed";
             LogManager.printExceptionLog(e, log);
+            Assert.fail(log);
         }
-
     }
 
     public static List<String> getGivenColumnValueFromStatement(String queryStatement, String columnName) {
@@ -35,7 +34,8 @@ public class DBUtils {
                 SQLDataset.add(resultSet.getString(columnName));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            String log = "Unable get data from DB";
+            LogManager.printExceptionLog(e, log);
         }
         DBUtils.closeConnection();
         return SQLDataset;
@@ -57,7 +57,8 @@ public class DBUtils {
                 data.add(row);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            String log = "Unable get data from DB";
+            LogManager.printExceptionLog(e, log);
         }
         DBUtils.closeConnection();
         return data;
@@ -73,6 +74,38 @@ public class DBUtils {
             String log = "Connection closed failed";
             LogManager.printExceptionLog(e, log);
         }
+    }
 
+    public static List<String> getRowDataAsList(String sqlQuery, Map<Integer, String> queryParams) {
+        PreparedStatement query = null;
+        List<String> rowData = new ArrayList<>();
+        DBUtils.initDBConnection();
+        try {
+            query = con.prepareStatement(sqlQuery);
+            for (int i = 1; i <= queryParams.size(); i++) {
+                query.setString(i, queryParams.get(i));
+            }
+            ResultSet resultSet = query.executeQuery();
+
+            resultSet.next();
+            for (int j = 1; j <= resultSet.getMetaData().getColumnCount(); j++) {
+                rowData.add(resultSet.getString(j));
+            }
+
+        } catch (Exception exception) {
+            String log = "Unable get data from DB";
+            LogManager.printExceptionLog(exception, log);
+        } finally {
+
+            if (query != null) {
+                try {
+                    query.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                DBUtils.closeConnection();
+            }
+        }
+        return rowData;
     }
 }
