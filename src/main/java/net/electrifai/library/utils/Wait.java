@@ -163,7 +163,7 @@ public class Wait
                 wait.until(ExpectedConditions.alertIsPresent());
                 break;
             default:
-                LogManager.printInfoLog("Inavlid Explicit Wait Selection");
+                LogManager.printInfoLog("Invalid Explicit Wait Selection");
         }
     }
 
