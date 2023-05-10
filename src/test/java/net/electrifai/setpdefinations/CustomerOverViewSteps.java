@@ -1,31 +1,11 @@
 package net.electrifai.setpdefinations;
 
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import net.electrifai.library.pom.CustomerOverviewPage;
 import net.electrifai.library.pom.HomePage;
 import net.electrifai.library.pom.ReportLandingPage;
-import net.electrifai.library.utils.GenericPageActions;
-import net.electrifai.library.utils.LogManager;
-import net.electrifai.library.utils.ThreadLocalManager;
-import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
-import org.openqa.selenium.WebElement;
-import org.testng.Assert;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static net.electrifai.library.pom.HomePage.projectPath;
-import static net.electrifai.library.pom.HomePage.property;
-
-import net.electrifai.library.pom.CustomerOverviewPage;
-import net.electrifai.library.utils.LogManager;
 import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static net.electrifai.library.pom.HomePage.projectPath;
@@ -107,14 +87,14 @@ public class CustomerOverViewSteps {
         coPage.countCheck();
     }
 
-    @Then("validate inactive customer count for the product widget")
-    public void validateInactiveCustomerCountForTheProductWidget() {
-        coPage.validateInactiveCustomerCount();
+    @Then("validate new customer count for the product widget")
+    public void validateNewCustomerCountForTheProductWidget() {
+        coPage.validateNewCustomerCount();
     }
 
-    @Then("validate percentage count for the product widget")
+    @Then("validate new customer percentage count for the product widget")
     public void validatePercentageCountForTheProductWidget() {
-        coPage.validatePercentageCount();
+        coPage.validateNewCustPercentage();
 
     }
 }
