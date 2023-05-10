@@ -21,6 +21,8 @@ public class ReportLandingPage extends HomePage {
     @FindBy(css = "button[class*='ant-btn ant-btn-primary']:not([class*='ant-dropdown-trigger'])")
     WebElement applyFiltersButton;
     String logMessage;
+    @FindBy(xpath = "(//div[@class='ant-space-item'])[3]")
+    WebElement propensity_link_cross_sell;
 
     public void selectOptionFromGivenDropDown(String dropDown, String option) {
         try {
@@ -74,10 +76,18 @@ public class ReportLandingPage extends HomePage {
     }
 
     public void verifyPropensitySelection(String expectedPropensity) {
-        Assert.assertEquals(filterCriteria.get(1).getText().trim(), expectedPropensity, expectedPropensity + " not selected");
+        Assert.assertEquals(filterCriteria.get(1).getText().trim(), expectedPropensity, expectedPropensity + " selected");
         String logMessage = "Propensity " + expectedPropensity + " selection validated successfully";
         LogManager.printInfoLog(logMessage);
 
     }
+//
+//    public String verifyPropensityWithDefaultSelection(String expectedPropensity){
+//        String productName =  propensity_link_cross_sell.getText();
+//        LogManager.printInfoLog("The product name is"+ productName);
+//        return productName.trim();
+//    }
+
+
 
 }
