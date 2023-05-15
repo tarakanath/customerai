@@ -1,24 +1,47 @@
 package net.electrifai.library.utils;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.testng.Assert;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class DBUtils {
     private static Connection con;
     private static Statement stmt;
+    private static boolean executeDBcmd=true;
 
     private static void initDBConnection() {
+        if(executeDBcmd){
+            File dir = new File(System.getProperty("user.dir")+"\\src\\test\\resources\\dbcmd");
+            ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/C", "Start","dbConnection.bat");
+            pb.directory(dir);
+            try {
+                Process p = pb.start();
+                p.waitFor(30, TimeUnit.SECONDS);
+            } catch (IOException | InterruptedException e) {
+                String log="Data base port forward failed";
+                LogManager.printExceptionLog(e,log);
+                Thread.currentThread().interrupt();
+            }
+            executeDBcmd=false;
+        }
         try {
-            Class.forName(PropertiesFile.getProperty("testEnvironment.properties").getString("JDBC_DRIVER"));
-            String dbUrl = PropertiesFile.getProperty("testEnvironment.properties").getString("dbUrl");
-            String dbUserName = PropertiesFile.getProperty("testEnvironment.properties").getString("dbUserName");
-            String dbPassword = PropertiesFile.getProperty("testEnvironment.properties").getString("dbPassword");
+
+            CompositeConfiguration prop=PropertiesFile.getProperty("testEnvironment.properties");
+            Class.forName(prop.getString("JDBC_DRIVER"));
+            String dbUrl = prop.getString("dbUrl");
+            String dbUserName = prop.getString("dbUserName");
+            String dbPassword = prop.getString("dbPassword");
             con = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
             stmt = con.createStatement();
             LogManager.printInfoLog("DB Connection initiated");
-        } catch (Exception e) {
+        } catch (SQLException | ClassNotFoundException | ConfigurationException | FileNotFoundException e) {
             String log = " DB Connection failed";
             LogManager.printExceptionLog(e, log);
             Assert.fail(log);
@@ -26,19 +49,19 @@ public class DBUtils {
     }
 
     public static List<String> getGivenColumnValueFromStatement(String queryStatement, String columnName) {
-        List<String> SQLDataset = new ArrayList<String>();
+        List<String> sqlDataset = new ArrayList<String>();
         try {
             DBUtils.initDBConnection();
             ResultSet resultSet = stmt.executeQuery(queryStatement);
             while (resultSet.next()) {
-                SQLDataset.add(resultSet.getString(columnName));
+                sqlDataset.add(resultSet.getString(columnName));
             }
         } catch (Exception e) {
             String log = "Unable get data from DB";
             LogManager.printExceptionLog(e, log);
         }
         DBUtils.closeConnection();
-        return SQLDataset;
+        return sqlDataset;
     }
 
     public static List<Map<String, String>> getDataFromStatement(String queryStatement) {
