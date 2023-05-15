@@ -1,5 +1,4 @@
 package net.electrifai.library.pom;
-
 import net.electrifai.library.utils.DBUtils;
 import net.electrifai.library.utils.LogManager;
 import net.electrifai.library.utils.excelsheet.ReadAndWriteExcel;
@@ -10,15 +9,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
-
 import java.util.*;
-
 import static org.testng.Assert.assertEquals;
-
 import java.text.DecimalFormat;
-
 import static net.electrifai.library.utils.DriverSetUp.driver;
-
 public class CustomerOverviewPage extends HomePage {
     String excelFilePath = projectPath + property.getString("testDataPath");
     public static Map<String, String> data = null;
