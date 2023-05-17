@@ -47,7 +47,7 @@ public class ReportLandingPage extends HomePage {
         try {
 
             //Thread.sleep(1000);
-            Wait.explicitWait(dropDownElements.get(1), "visibility");
+            Wait.explicitWait(dropDownElements.get(0), "visibility");
             for (WebElement element : dropDownElements
             ) {
                 if (element.getText().trim().equals(option)) {
