@@ -1,0 +1,1 @@
+ssh -L 3306:customer-engagement-dev-mysql.cwudviw2olke.ap-south-1.rds.amazonaws.com:3306 -i dev-bastion.pem ec2-user@13.127.154.1

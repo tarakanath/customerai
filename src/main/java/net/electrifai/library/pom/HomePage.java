@@ -44,6 +44,8 @@ public class HomePage {
     WebElement customerChurn;
     @FindBy(xpath = "//li[contains(@data-menu-id,'campaigns')]")
     WebElement campaigns;
+    @FindBy(xpath = "//span[contains(text(),'Customer Acquisition')]")
+    WebElement customerAcquisition;
     @FindBy(xpath = "(//header[contains(@class,'ant-layout-header')]//div)[2]")
     WebElement pageHeading;
 
@@ -107,7 +109,12 @@ public class HomePage {
                 Assert.assertEquals(pageHeading.getText(), pageName);
                 LogManager.printInfoLog("User landed on " + pageHeading.getText() + " page.");
                 break;
-
+            case "Customer Acquisition":
+                GenericPageActions.click(customerAcquisition, "Customer Acquisition");
+                Wait.explicitWaitTextVerification(pageHeading, "Customer Acquisition");
+                Assert.assertEquals(pageHeading.getText(), pageName);
+                LogManager.printInfoLog("User landed on " + pageHeading.getText() + " page.");
+                break;
             default:
                 String logMessage = "Selected page doesn't exist.";
                 LogManager.printFailLog(logMessage);

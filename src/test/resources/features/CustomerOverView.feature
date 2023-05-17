@@ -1,7 +1,7 @@
 @overview
 Feature: Customer Overview page validation.
 
-  Background:
+  Scenario: Login into application
     Given User landed on Customer AI Application
     And "admin" logged into application get login data from the file "loginPage" where the sheet is "LoginCredentials" and DataRowNum  is "1"
   @overview1
@@ -22,6 +22,8 @@ Feature: Customer Overview page validation.
     Then Validate Active and Newly Onboarded Customers Percentage from UI
     Then Validate total count of Active and Inactive customers
 
+  Scenario: logout application
+      Then logout from the application
 
 
 
